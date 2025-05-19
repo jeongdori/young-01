@@ -1,0 +1,40 @@
+# Node modules
+node_modules/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# frontend build output (예: Vite, CRA)
+young-01-client/dist/
+young-01-client/.vite/
+
+# backend build output (optional)
+young-01-server/dist/
+young-01-server/build/
+
+# Editor files
+.vscode/*
+!.vscode/extensions.json
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Docker stuff
+**/data/
+**/tmp/
+docker-compose.override.yml
+
+# 환경 설정
+.env
+.env.*
+!.env.test    # ✅ test용만 Git에 포함

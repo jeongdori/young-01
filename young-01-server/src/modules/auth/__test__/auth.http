@@ -1,0 +1,25 @@
+### 회원가입
+POST http://localhost:3000/auth/register
+Content-Type: application/json
+
+{
+  "email": "user6@example.com",
+  "password": "qwer1234",
+  "name": "테스터"
+}
+
+###
+
+### 로그인
+POST http://localhost:3000/auth/login
+Content-Type: application/json
+
+{
+  "email": "user1@example.com",
+  "password": "qwer1234"
+}
+
+###
+
+### Access Token 재발급 (Refresh Token은 쿠키로 보내야 함)
+POST http://localhost:3000/auth/refresh

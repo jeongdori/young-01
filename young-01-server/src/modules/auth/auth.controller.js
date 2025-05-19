@@ -1,0 +1,70 @@
+const { resSuccess, resError } = require('@utils/response');
+const { requireFields } = require('@utils/validate');
+
+const authService = require('./auth.service');
+
+exports.login = async (req, res) => {
+    try {
+        requireFields(req.body, ['email', 'password']);
+        const data = await authService.login(req.body);
+        res.cookie('accessToken', data.token.accessToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict',
+            maxAge: 1000 * 60 * 30, // 30분
+        });
+        res.cookie('refreshToken', data.token.refreshToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict',
+            maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
+        });
+
+        resSuccess(res, data.user, '로그인 성공');
+    } catch (err) {
+        resError(res, err);
+    }
+};
+
+exports.logout = (req, res) => {
+    try {
+        const refreshToken = req?.cookies?.refreshToken;
+        if (!refreshToken) return resCustom(401, '로그인 상태가 아닙니다');
+
+        res.clearCookie('accessToken', {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict',
+            path: '/',
+        });
+        res.clearCookie('refreshToken', {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict',
+            path: '/',
+        });
+        resSuccess(res, null, '로그아웃 성공');
+    } catch (err) {
+        return resError(res, err);
+    }
+};
+
+exports.register = async (req, res) => {
+    try {
+        requireFields(req.body, ['email', 'password', 'name']);
+        await authService.register(req.body);
+        resSuccess(res, null, '회원가입 완료', 201);
+    } catch (err) {
+        resError(res, err);
+    }
+};
+
+exports.refresh = async (req, res) => {
+    try {
+        const refreshToken = req.cookies.refresh_token;
+        const result = await authService.refresh(refreshToken);
+        resSuccess(res, result);
+    } catch (err) {
+        resError(res, err);
+    }
+};

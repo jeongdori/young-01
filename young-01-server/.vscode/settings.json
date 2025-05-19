@@ -1,0 +1,6 @@
+{
+    "jest.runMode": {
+        "type": "watch"
+    },
+    "testing.automaticallyOpenTestResults": "neverOpen"
+}

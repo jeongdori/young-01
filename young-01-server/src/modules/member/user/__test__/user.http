@@ -1,0 +1,29 @@
+@access_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTQsImdyb3VwcyI6W10sImlhdCI6MTc0NzI5NzM5NiwiZXhwIjoxNzQ3Mjk5MTk2fQ.G2hBnYtxeMWnd-HGmDpO8yMD7yJsIk1J-bLeVzDhHQc
+
+### 내 정보 조회
+GET http://localhost:3000/users/me
+Authorization: Bearer {{access_token}}
+
+###
+
+### 내 정보 수정
+PUT http://localhost:3000/users/me
+Authorization: Bearer {{access_token}}
+Content-Type: application/json
+
+{
+  "name": "변경된 이름",
+  "email": "user1@example.com"
+}
+
+###
+
+### 사용자 전체 목록 (관리자만 가능 시 adminOnlyMiddleware 필요)
+GET http://localhost:3000/users
+Authorization: Bearer {{access_token}}
+
+###
+
+### 특정 사용자 조회 (id: 1)
+GET http://localhost:3000/users/1
+Authorization: Bearer {{access_token}}
