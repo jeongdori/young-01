@@ -8,6 +8,7 @@ const cors = require('cors');
 const app = express();
 
 const userRoutes = require('@routes/index');
+const authMiddleware = require('@middlewares/authMiddleware');
 
 app.use(
     cors({
@@ -17,6 +18,8 @@ app.use(
 );
 app.use(cookieParser());
 app.use(express.json());
+
+app.use(authMiddleware);
 app.use('/', userRoutes);
 
 module.exports = app;

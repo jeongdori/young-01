@@ -1,6 +1,6 @@
-const User = require('./User');
-const Group = require('./Group');
-const UserGroupMap = require('./UserGroupMap');
+const User = require('@/modules/member/user/User');
+const Group = require('@/modules/member/user/Group');
+const UserGroupMap = require('@/modules/member/user/UserGroupMap');
 
 const models = {
     User,

@@ -1,0 +1,153 @@
+폴더 PATH의 목록입니다.
+볼륨 일련 번호는 86BA-435C입니다.
+C:.
+|   .gitignore
+|   docker-compose.yml
+|   README.md
+|   tree.txt
+|   
++---data
+|   \---redis
+|           dump.rdb
+|           
++---young-01-client
+|   |   .env
+|   |   .env.dev
+|   |   .env.prod
+|   |   .env.test
+|   |   .gitignore
+|   |   eslint.config.js
+|   |   index.html
+|   |   package.json
+|   |   vite.config.js
+|   |   
+|   +---public
+|   |       vite.svg
+|   |       
+|   \---src
+|       |   App.css
+|       |   App.jsx
+|       |   index.css
+|       |   main.jsx
+|       |   
+|       +---api
+|       |       axios.js
+|       |       
+|       +---assets
+|       |       react.svg
+|       |       
+|       +---components
+|       |       FormError.jsx
+|       |       
+|       +---features
+|       |   +---auth
+|       |   |   |   services.js
+|       |   |   |   
+|       |   |   +---hook
+|       |   |   |       useLogin.js
+|       |   |   |       useLogout.js
+|       |   |   |       
+|       |   |   \---pages
+|       |   |           LoginPage.jsx
+|       |   |           RegisterPage.jsx
+|       |   |           
+|       |   +---main
+|       |   |   \---pages
+|       |   |           MainPage.jsx
+|       |   |           
+|       |   \---user
+|       +---hooks
+|       +---layouts
+|       |       HomeLayout.jsx
+|       |       
+|       +---pages
+|       +---router
+|       |       auth.routes.jsx
+|       |       index.jsx
+|       |       main.routes.jsx
+|       |       
+|       +---stores
+|       |   \---auth
+|       |           useAuth.js
+|       |           
+|       +---styles
+|       |       theme.js
+|       |       
+|       \---utils
+\---young-01-server
+    |   .env
+    |   .env.dev
+    |   .env.prod
+    |   .env.test
+    |   .eslintrc.js
+    |   .prettierrc
+    |   jest.config.js
+    |   jsconfig.json
+    |   nodemon.json
+    |   package.json
+    |   README.md
+    |   
+    +---.vscode
+    |       launch.json
+    |       settings.json
+    |       
+    \---src
+        |   app.js
+        |   server.js
+        |   
+        +---config
+        |       db.js
+        |       jwt.js
+        |       redis.js
+        |       
+        +---lib
+        |       jwt.js
+        |       loadEnv.js
+        |       redis.js
+        |       sequelize.js
+        |       
+        +---middlewares
+        |       adminAuthMiddleware.js
+        |       authMiddleware.js
+        |       validate.js
+        |       
+        +---models
+        |       Group.js
+        |       index.js
+        |       User.js
+        |       UserGroupMap.js
+        |       
+        +---modules
+        |   +---admin
+        |   +---auth
+        |   |   |   auth.controller.js
+        |   |   |   auth.repository.js
+        |   |   |   auth.routes.js
+        |   |   |   auth.schema.js
+        |   |   |   auth.service.js
+        |   |   |   auth.token.service.js
+        |   |   |   
+        |   |   \---__test__
+        |   |           auth.http
+        |   |           auth.test.js
+        |   |           
+        |   \---member
+        |       \---user
+        |           |   user.controller.js
+        |           |   user.repository.js
+        |           |   user.routes.js
+        |           |   user.schema.js
+        |           |   user.service.js
+        |           |   
+        |           \---__test__
+        |                   user.http
+        |                   user.test.js
+        |                   
+        +---routes
+        |       index.js
+        |       
+        \---utils
+                db.js
+                response.js
+                validate.js
+                

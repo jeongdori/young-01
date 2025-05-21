@@ -2,10 +2,17 @@ const jwt = require('jsonwebtoken');
 const { resError } = require('@utils/response');
 const jwtConfig = require('@config/jwt');
 
-module.exports = (req, res, next) => {
-    const authHeader = req.headers['authorization'];
-    const token = authHeader && authHeader.split(' ')[1];
+// 인증 예외 경로
+const publicPaths = ['/auth/login', '/auth/register', '/auth/refresh'];
 
+module.exports = (req, res, next) => {
+    console.log('Request Path:', req.path);
+    if (publicPaths.includes(req.path)) {
+        return next(); // 예외 경로는 통과
+    }
+
+    // 쿠키에서 accessToken 가져오기
+    const token = req.cookies?.accessToken;
     if (!token) {
         return resError(res, 'NO_TOKEN', 401);
     }

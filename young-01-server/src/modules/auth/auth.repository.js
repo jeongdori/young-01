@@ -13,6 +13,7 @@ exports.findUserWithGroupsByEmail = async (email) => {
 exports.findUserWithGroupsById = async (id) => {
     return User.findOne({
         where: { id },
+        attributes: { exclude: ['password'] },
         include: {
             model: Group,
             through: { attributes: [] },
@@ -21,7 +22,10 @@ exports.findUserWithGroupsById = async (id) => {
 };
 
 exports.findUserByEmail = (email) => {
-    return User.findOne({ where: { email } });
+    return User.findOne({
+        where: { email },
+        attributes: { include: ['password'] },
+    });
 };
 
 exports.createUser = ({ email, password, name }) => {

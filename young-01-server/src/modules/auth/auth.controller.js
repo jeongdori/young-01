@@ -1,11 +1,9 @@
 const { resSuccess, resError } = require('@utils/response');
-const { requireFields } = require('@utils/validate');
 
 const authService = require('./auth.service');
 
 exports.login = async (req, res) => {
     try {
-        requireFields(req.body, ['email', 'password']);
         const data = await authService.login(req.body);
         res.cookie('accessToken', data.token.accessToken, {
             httpOnly: true,
@@ -26,10 +24,12 @@ exports.login = async (req, res) => {
     }
 };
 
-exports.logout = (req, res) => {
+exports.logout = async (req, res) => {
     try {
         const refreshToken = req?.cookies?.refreshToken;
         if (!refreshToken) return resCustom(401, '로그인 상태가 아닙니다');
+
+        await authService.logout(req.user);
 
         res.clearCookie('accessToken', {
             httpOnly: true,
@@ -51,7 +51,6 @@ exports.logout = (req, res) => {
 
 exports.register = async (req, res) => {
     try {
-        requireFields(req.body, ['email', 'password', 'name']);
         await authService.register(req.body);
         resSuccess(res, null, '회원가입 완료', 201);
     } catch (err) {
@@ -62,8 +61,20 @@ exports.register = async (req, res) => {
 exports.refresh = async (req, res) => {
     try {
         const refreshToken = req.cookies.refresh_token;
-        const result = await authService.refresh(refreshToken);
-        resSuccess(res, result);
+        const data = await authService.refresh(refreshToken);
+        res.cookie('accessToken', data.token.accessToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict',
+            maxAge: 1000 * 60 * 30, // 30분
+        });
+        res.cookie('refreshToken', data.token.refreshToken, {
+            httpOnly: true,
+            secure: true,
+            sameSite: 'strict',
+            maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
+        });
+        resSuccess(res, data.user);
     } catch (err) {
         resError(res, err);
     }
