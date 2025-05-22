@@ -1,18 +1,24 @@
 // src/features/auth/hooks/useLogin.js
 import { useMutation } from "@tanstack/react-query";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import useAuth from "@/stores/auth/useAuth";
 import authService from "../services";
 
 const useLogin = () => {
   const navigate = useNavigate();
+  const location = useLocation();
+  const redirectTo =
+    location.state?.from?.pathname ||
+    new URLSearchParams(location.search).get("redirect") ||
+    "/main";
 
   return useMutation({
     mutationFn: authService.login,
     onSuccess: (res) => {
       useAuth.getState().login(res.data.data);
-      alert("로그인 성공");
-      navigate("/main");
+      navigate(redirectTo, {
+        replace: true,
+      });
     },
     onError: (error) => {
       const status = error.response?.status;

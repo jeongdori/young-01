@@ -20,17 +20,33 @@ const processQueue = (error, token = null) => {
   failedQueue = [];
 };
 
+// 요청 인터셉터
+// instance.interceptors.request.use(
+//   (request) => {
+//     console.log("request success:", request);
+//     return request;
+//   },
+//   (error) => {
+//     console.log("Response error:", error);
+
+//     return error;
+//   }
+// );
+
 // 응답 인터셉터
 instance.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    return response;
+  },
   async (error) => {
     const originalRequest = error.config;
     const status = error.response?.status;
     const message = error.response?.data?.message;
 
+    const expiredMessages = ["TOKEN_EXPIRED", "jwt expired"];
     if (
       status === 401 &&
-      (message === "TOKEN_EXPIRED" || message === "jwt expired") &&
+      expiredMessages.includes(message) &&
       !originalRequest._retry
     ) {
       if (isRefreshing) {
@@ -43,11 +59,7 @@ instance.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        await instance.post(
-          `${defaultPath}/refresh`,
-          {},
-          { withCredentials: true }
-        );
+        await instance.post("/refresh", {}, { withCredentials: true });
         processQueue(null);
         return instance(originalRequest); // 다시 요청
       } catch (err) {
@@ -55,7 +67,10 @@ instance.interceptors.response.use(
         if (err.response?.status === 403 || err.response?.status === 401) {
           // 상태 초기화, 로그인 페이지 이동
           useAuth.getState().logout(); // 상태 초기화 유틸
-          window.location.href = "/login";
+          const currentPath = window.location.pathname + window.location.search;
+          window.location.href = `/login?redirect=${encodeURIComponent(
+            currentPath
+          )}`;
         }
         return Promise.reject(err);
       } finally {

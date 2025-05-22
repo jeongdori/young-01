@@ -1,6 +1,6 @@
 import axios from "@/api/axios";
 
-const defaultPath = "/auth";
+const defaultPath = "";
 const authService = {
   login: (data) =>
     axios.post(`${defaultPath}/login`, data, {

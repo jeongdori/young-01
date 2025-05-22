@@ -1,19 +1,20 @@
 import { useForm, FormProvider } from "react-hook-form";
 import { TextField, Button, Container, Typography } from "@mui/material";
-import { useMutation } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
+import { joiResolver } from "@hookform/resolvers/joi";
 
-import useAuth from "@/stores/auth/useAuth";
 import FormError from "@/components/FormError";
 
 import useLogin from "../hook/useLogin";
+import { loginSchema } from "../schemas/user.schema";
 
 const LoginPage = () => {
   const methods = useForm({
     mode: "onSubmit",
-    defaultValues: {},
+    resolver: joiResolver(loginSchema),
   });
   const { handleSubmit, register } = methods;
+
   const navigate = useNavigate();
 
   const loginMutation = useLogin();
@@ -37,7 +38,7 @@ const LoginPage = () => {
             label="Email"
             fullWidth
             margin="normal"
-            {...register("email", { required: "이메일은 필수입니다" })}
+            {...register("email")}
           />
           <FormError name="email" />
           <TextField
@@ -45,9 +46,7 @@ const LoginPage = () => {
             type="password"
             fullWidth
             margin="normal"
-            {...register("password", {
-              required: "비밀번호는 필수입니다",
-            })}
+            {...register("password")}
           />
           <FormError name="password" />
           <Button

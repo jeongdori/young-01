@@ -18,8 +18,8 @@ exports.registerSchema = Joi.object({
     ...baseAuthSchema,
     password: Joi.string()
         .min(8)
-        .max(16)
-        .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,16}$/)
+        .max(20)
+        .pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,20}$/)
         .required()
         .messages({
             'string.pattern.base':

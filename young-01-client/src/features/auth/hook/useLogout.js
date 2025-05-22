@@ -8,11 +8,12 @@ const useLogout = () => {
 
   const logout = async () => {
     try {
-      await instance.post("/auth/logout");
-      logoutState();
-      navigate("/login");
+      await instance.post("/logout");
     } catch (err) {
       console.error("로그아웃 요청 실패:", err);
+    } finally {
+      logoutState();
+      navigate("/login");
     }
   };
 

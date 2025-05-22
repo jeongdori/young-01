@@ -22,7 +22,9 @@ const HomeLayout = () => {
       <AppBar position="static">
         <Toolbar>
           <Typography variant="h6" sx={{ flexGrow: 1 }}>
-            Young
+            <a href="#" onClick={() => navigate("/")}>
+              <img src="/vite.svg" alt="Young" />
+            </a>
           </Typography>
           {user ? (
             <>

@@ -7,7 +7,7 @@ const router = express.Router();
  *
  */
 
-const authRoutes = require('@/modules/auth/auth.routes');
+const authRoutes = require('@/modules/common/auth/auth.routes');
 
 /**
  *
@@ -16,9 +16,9 @@ const authRoutes = require('@/modules/auth/auth.routes');
  */
 
 // user
-const userRoutes = require('@/modules/member/user/user.routes');
+const userRoutes = require('@/modules/common/user/user.routes');
 
-router.use('/auth', authRoutes);
+router.use('/', authRoutes);
 router.use('/users', userRoutes);
 
 module.exports = router;

@@ -9,13 +9,15 @@ exports.login = async (req, res) => {
             httpOnly: true,
             secure: true,
             sameSite: 'strict',
-            maxAge: 1000 * 60 * 30, // 30분
+            maxAge: (process.env.ACCESS_TOKEN_EXPIRES_IN || 60 * 30) * 1000, // 30분
         });
         res.cookie('refreshToken', data.token.refreshToken, {
             httpOnly: true,
             secure: true,
             sameSite: 'strict',
-            maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
+            maxAge:
+                (process.env.REFRESH_TOKEN_EXPIRES_IN || 60 * 60 * 24 * 7) *
+                1000, // 7일
         });
 
         resSuccess(res, data.user, '로그인 성공');
@@ -66,13 +68,15 @@ exports.refresh = async (req, res) => {
             httpOnly: true,
             secure: true,
             sameSite: 'strict',
-            maxAge: 1000 * 60 * 30, // 30분
+            maxAge: (process.env.ACCESS_TOKEN_EXPIRES_IN || 60 * 30) * 1000, // 30분
         });
         res.cookie('refreshToken', data.token.refreshToken, {
             httpOnly: true,
             secure: true,
             sameSite: 'strict',
-            maxAge: 1000 * 60 * 60 * 24 * 7, // 7일
+            maxAge:
+                (process.env.REFRESH_TOKEN_EXPIRES_IN || 60 * 60 * 24 * 7) *
+                1000, // 7일
         });
         resSuccess(res, data.user);
     } catch (err) {

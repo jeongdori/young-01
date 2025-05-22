@@ -6,7 +6,7 @@ const userController = require('./user.controller');
 const { userSchema } = require('./user.schema');
 
 router.get('/me', userController.findMe);
-router.put('/me', validate({ body: userSchema }), userController.updateMe);
+router.put('/me', validate(userSchema), userController.updateMe);
 
 router.get('/', userController.findAll); // 목록 조회
 router.get('/:id', userController.findById); // 상세 조회
@@ -14,7 +14,7 @@ router.post('/', userController.create); // 신규 등록
 router.put(
     '/:id',
 
-    validate({ body: userSchema }),
+    validate(userSchema),
     userController.update,
 ); // 수정
 router.delete('/:id', userController.delete); // 삭제

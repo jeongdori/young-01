@@ -1,11 +1,20 @@
-import { useForm } from "react-hook-form";
+import { useForm, FormProvider } from "react-hook-form";
 import { TextField, Button, Container, Typography } from "@mui/material";
-import { useMutation } from "@tanstack/react-query";
-import authService from "../services";
 import { useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { joiResolver } from "@hookform/resolvers/joi";
+
+import FormError from "@/components/FormError";
+
+import authService from "../services";
+import { registerSchema } from "../schemas/user.schema";
 
 const RegisterPage = () => {
-  const { register, handleSubmit } = useForm();
+  const methods = useForm({
+    mode: "onSubmit",
+    resolver: joiResolver(registerSchema),
+  });
+  const { handleSubmit, register } = methods;
   const navigate = useNavigate();
 
   const mutation = useMutation({
@@ -31,35 +40,44 @@ const RegisterPage = () => {
       <Typography variant="h5" align="center" gutterBottom>
         회원가입
       </Typography>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <TextField
-          label="이메일"
-          fullWidth
-          margin="normal"
-          {...register("email")}
-        />
-        <TextField
-          label="이름"
-          fullWidth
-          margin="normal"
-          {...register("name")}
-        />
-        <TextField
-          label="비밀번호"
-          type="password"
-          fullWidth
-          margin="normal"
-          {...register("password")}
-        />
-        <Button
-          type="submit"
-          variant="contained"
-          fullWidth
-          disabled={mutation.isLoading}
-        >
-          가입하기
-        </Button>
-      </form>
+      <FormProvider {...methods}>
+        <form onSubmit={handleSubmit(onSubmit)}>
+          <TextField
+            label="이메일"
+            fullWidth
+            margin="normal"
+            {...register("email")}
+          />
+          <FormError name="email" />
+
+          <TextField
+            label="비밀번호"
+            type="password"
+            fullWidth
+            margin="normal"
+            {...register("password")}
+          />
+          <FormError name="password" />
+
+          <TextField
+            label="이름"
+            fullWidth
+            margin="normal"
+            {...register("name")}
+          />
+          <FormError name="name" />
+
+          <Button
+            type="submit"
+            variant="contained"
+            color="primary"
+            fullWidth
+            disabled={mutation.isLoading}
+          >
+            회원가입
+          </Button>
+        </form>
+      </FormProvider>
     </Container>
   );
 };

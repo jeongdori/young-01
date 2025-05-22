@@ -7,9 +7,9 @@ module.exports = (schemas) => {
             query: req.query,
             params: req.params,
         };
+        const schema = schemas;
 
         for (const key of Object.keys(schemas)) {
-            const schema = schemas[key];
             const { error, value } = schema.validate(targets[key], {
                 abortEarly: true,
             });
