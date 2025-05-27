@@ -4,12 +4,14 @@ import HomeLayout from "@/layouts/HomeLayout";
 
 import mainRoutes from "./main.routes";
 import authRoutes from "./auth.routes";
+import userRoutes from "./user.routes";
 
 const Router = () => {
   const homeRoutes = [
     { path: "/", element: <Navigate to="/main" replace /> },
     ...mainRoutes,
     ...authRoutes,
+    ...userRoutes,
   ];
 
   return (

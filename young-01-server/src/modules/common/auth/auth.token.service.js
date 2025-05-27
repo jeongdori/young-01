@@ -2,6 +2,8 @@ const jwt = require('@lib/jwt');
 const jwtConfig = require('@config/jwt');
 const redis = require('@lib/redis');
 
+const { resCustom } = require('@utils/response');
+
 /**
  * access + refresh token 발급 + 저장
  */

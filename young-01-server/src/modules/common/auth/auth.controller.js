@@ -2,6 +2,11 @@ const { resSuccess, resError } = require('@utils/response');
 
 const authService = require('./auth.service');
 
+exports.getPublicKey = (req, res) => {
+    const key = authService.getPublicKey();
+    resSuccess(res, { publicKey: key }, '공개키 조회 성공');
+};
+
 exports.login = async (req, res) => {
     try {
         const data = await authService.login(req.body);
@@ -9,17 +14,17 @@ exports.login = async (req, res) => {
             httpOnly: true,
             secure: true,
             sameSite: 'strict',
-            maxAge: (process.env.ACCESS_TOKEN_EXPIRES_IN || 60 * 30) * 1000, // 30분
+            maxAge:
+                (Number(process.env.JWT_ACCESS_EXPIRES_IN) || 60 * 30) * 1000, // 30분
         });
         res.cookie('refreshToken', data.token.refreshToken, {
             httpOnly: true,
             secure: true,
             sameSite: 'strict',
             maxAge:
-                (process.env.REFRESH_TOKEN_EXPIRES_IN || 60 * 60 * 24 * 7) *
-                1000, // 7일
+                (Number(process.env.JWT_REFRESH_EXPIRES_IN) ||
+                    60 * 60 * 24 * 7) * 1000, // 7일
         });
-
         resSuccess(res, data.user, '로그인 성공');
     } catch (err) {
         resError(res, err);
@@ -62,21 +67,22 @@ exports.register = async (req, res) => {
 
 exports.refresh = async (req, res) => {
     try {
-        const refreshToken = req.cookies.refresh_token;
+        const refreshToken = req.cookies.refreshToken;
         const data = await authService.refresh(refreshToken);
         res.cookie('accessToken', data.token.accessToken, {
             httpOnly: true,
             secure: true,
             sameSite: 'strict',
-            maxAge: (process.env.ACCESS_TOKEN_EXPIRES_IN || 60 * 30) * 1000, // 30분
+            maxAge:
+                (Number(process.env.JWT_ACCESS_EXPIRES_IN) || 60 * 30) * 1000, // 30분
         });
         res.cookie('refreshToken', data.token.refreshToken, {
             httpOnly: true,
             secure: true,
             sameSite: 'strict',
             maxAge:
-                (process.env.REFRESH_TOKEN_EXPIRES_IN || 60 * 60 * 24 * 7) *
-                1000, // 7일
+                (Number(process.env.JWT_REFRESH_EXPIRES_IN) ||
+                    60 * 60 * 24 * 7) * 1000, // 7일
         });
         resSuccess(res, data.user);
     } catch (err) {

@@ -1,4 +1,5 @@
 import axios from "axios";
+import useAuth from "@/stores/auth/useAuth";
 
 const instance = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:3000",
@@ -33,20 +34,30 @@ const processQueue = (error, token = null) => {
 //   }
 // );
 
+const refreshableMessages = ["NO_TOKEN", "TOKEN_EXPIRED", "jwt expired"];
+const redirectToLoginMessages = ["INVALID_TOKEN"];
+
 // 응답 인터셉터
 instance.interceptors.response.use(
   (response) => {
-    return response;
+    const { success, data, message } = response.data;
+
+    if (!success) {
+      const err = new Error(message || "알 수 없는 오류");
+      err.status = response.status;
+      throw err;
+    }
+
+    return data;
   },
   async (error) => {
     const originalRequest = error.config;
     const status = error.response?.status;
     const message = error.response?.data?.message;
 
-    const expiredMessages = ["TOKEN_EXPIRED", "jwt expired"];
     if (
       status === 401 &&
-      expiredMessages.includes(message) &&
+      refreshableMessages.includes(message) &&
       !originalRequest._retry
     ) {
       if (isRefreshing) {
@@ -76,6 +87,14 @@ instance.interceptors.response.use(
       } finally {
         isRefreshing = false;
       }
+    }
+
+    if (redirectToLoginMessages.includes(message) || status === 403) {
+      useAuth.getState().logout();
+      const currentPath = window.location.pathname + window.location.search;
+      window.location.href = `/login?redirect=${encodeURIComponent(
+        currentPath
+      )}`;
     }
 
     return Promise.reject(error);

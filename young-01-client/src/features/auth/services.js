@@ -2,6 +2,7 @@ import axios from "@/api/axios";
 
 const defaultPath = "";
 const authService = {
+  getPublicKey: () => axios.get("/public-key"),
   login: (data) =>
     axios.post(`${defaultPath}/login`, data, {
       withCredentials: true,

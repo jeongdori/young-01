@@ -5,7 +5,8 @@ const userService = require('./user.service');
 
 exports.findMe = async (req, res) => {
     try {
-        const user = await userService.findById(req.user.id);
+        const userId = req.user.id;
+        const user = await userService.findById(userId);
         if (!user) return resError(res, '사용자를 찾을 수 없습니다', 404);
         resSuccess(res, user);
     } catch (err) {
@@ -27,6 +28,17 @@ exports.updateMe = async (req, res) => {
     }
 };
 
+exports.deleteMe = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const deleted = await userService.delete(userId);
+        if (!deleted) return resError(res, '삭제 대상 없음', 404);
+        resSuccess(res, null, '삭제 완료');
+    } catch (err) {
+        resError(res, err);
+    }
+};
+
 exports.findAll = async (req, res) => {
     try {
         const users = await userService.findAll();
@@ -43,16 +55,6 @@ exports.findById = async (req, res) => {
         resSuccess(res, user);
     } catch (err) {
         resError(res, err);
-    }
-};
-
-exports.create = async (req, res) => {
-    try {
-        requireFields(req.body, ['name', 'email']);
-        await userService.create(req.body);
-        resSuccess(res, null, '등록 완료', 201);
-    } catch (err) {
-        resError(res, err, 400);
     }
 };
 

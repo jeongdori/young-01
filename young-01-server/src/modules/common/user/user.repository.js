@@ -8,10 +8,6 @@ exports.findUserById = (id) => {
     return User.findOne({ where: { id } });
 };
 
-exports.createUser = ({ name, email, password }) => {
-    return User.create({ name, email, password });
-};
-
 exports.updateUser = (id, { name, email }) => {
     return User.update({ name, email }, { where: { id } });
 };

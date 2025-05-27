@@ -8,7 +8,7 @@ const {
 } = require('@modules/common/user/user.schema');
 
 const authController = require('./auth.controller');
-
+router.get('/public-key', authController.getPublicKey);
 router.post('/login', validate(loginSchema), authController.login);
 router.post('/logout', authController.logout);
 

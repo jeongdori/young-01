@@ -19,6 +19,6 @@ const authRoutes = require('@/modules/common/auth/auth.routes');
 const userRoutes = require('@/modules/common/user/user.routes');
 
 router.use('/', authRoutes);
-router.use('/users', userRoutes);
+router.use('/user', userRoutes);
 
 module.exports = router;

@@ -1,7 +1,8 @@
-// src/features/auth/hooks/useLogin.js
 import { useMutation } from "@tanstack/react-query";
 import { useNavigate, useLocation } from "react-router-dom";
 import useAuth from "@/stores/auth/useAuth";
+import { importRSAPublicKey, encryptWithRSA } from "@/utils/rsaEncrypt";
+
 import authService from "../services";
 
 const useLogin = () => {
@@ -13,9 +14,19 @@ const useLogin = () => {
     "/main";
 
   return useMutation({
-    mutationFn: authService.login,
+    mutationFn: async ({ email, password }) => {
+      const data = await authService.getPublicKey();
+      const publicKey = await importRSAPublicKey(data.publicKey);
+
+      const encryptedPassword = await encryptWithRSA(publicKey, password);
+
+      return authService.login({
+        email,
+        password: encryptedPassword,
+      });
+    },
     onSuccess: (res) => {
-      useAuth.getState().login(res.data.data);
+      useAuth.getState().login(res);
       navigate(redirectTo, {
         replace: true,
       });

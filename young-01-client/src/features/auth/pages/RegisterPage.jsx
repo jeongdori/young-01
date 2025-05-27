@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { joiResolver } from "@hookform/resolvers/joi";
 
-import FormError from "@/components/FormError";
+import FormError from "@/components/errors/FormError";
 
 import authService from "../services";
 import { registerSchema } from "../schemas/user.schema";

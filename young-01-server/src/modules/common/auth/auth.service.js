@@ -1,14 +1,35 @@
+const crypto = require('crypto');
 const bcrypt = require('bcrypt');
 const { resCustom } = require('@utils/response');
 
 const authRepo = require('./auth.repository');
 const authTokenService = require('./auth.token.service');
 
+const { generateKeyPairSync, privateDecrypt } = crypto;
+const { publicKey, privateKey } = generateKeyPairSync('rsa', {
+    modulusLength: 2048,
+});
+
+const decryptPassword = (encrypted) => {
+    return crypto
+        .privateDecrypt(
+            {
+                key: privateKey,
+                padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+                oaepHash: 'sha256',
+            },
+            Buffer.from(encrypted, 'base64'),
+        )
+        .toString();
+};
+
 exports.login = async ({ email, password }) => {
     const user = await authRepo.findUserWithGroupsByEmail(email);
     if (!user) throw resCustom(401, '존재하지 않는 사용자입니다');
 
-    const match = await bcrypt.compare(password, user.password);
+    const encryptedPassword = decryptPassword(password);
+
+    const match = await bcrypt.compare(encryptedPassword, user.password);
     if (!match) throw resCustom(401, '비밀번호가 일치하지 않습니다');
 
     const plainUser = {
@@ -23,6 +44,8 @@ exports.login = async ({ email, password }) => {
 
     return { user, token: { accessToken, refreshToken } };
 };
+
+exports.getPublicKey = () => publicKey.export({ type: 'spki', format: 'pem' });
 
 exports.register = async ({ email, password, name }) => {
     const exists = await authRepo.findUserByEmail(email);
@@ -52,7 +75,6 @@ exports.refresh = async (refreshToken) => {
         email: user.email,
         groups: user.Groups.map((g) => g.name),
     };
-
     const { accessToken, refreshToken: newRefreshToken } =
         await authTokenService.generateTokenPair(plainUser);
     if (!accessToken) throw resCustom(500, 'Access token 생성 실패');

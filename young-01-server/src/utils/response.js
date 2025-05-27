@@ -45,6 +45,7 @@ exports.resError = (res, error, status, customMessage) => {
     res.status(httpStatus).json({
         success: false,
         message,
+        data: null,
     });
 };
 

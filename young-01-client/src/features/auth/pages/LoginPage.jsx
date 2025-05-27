@@ -3,7 +3,7 @@ import { TextField, Button, Container, Typography } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import { joiResolver } from "@hookform/resolvers/joi";
 
-import FormError from "@/components/FormError";
+import FormError from "@/components/errors/FormError";
 
 import useLogin from "../hook/useLogin";
 import { loginSchema } from "../schemas/user.schema";

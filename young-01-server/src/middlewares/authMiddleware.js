@@ -3,7 +3,7 @@ const { resError } = require('@utils/response');
 const jwtConfig = require('@config/jwt');
 
 // 인증 예외 경로
-const publicPaths = ['/login', '/register', '/refresh'];
+const publicPaths = ['/public-key', '/login', '/register', '/refresh'];
 
 module.exports = (req, res, next) => {
     console.log('Request Path:', req.path);
