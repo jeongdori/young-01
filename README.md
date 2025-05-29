@@ -46,11 +46,11 @@ young-01/ # 루트 디렉토리
 # 0. 도커 인프라 설치
 docker-compose up -d
 
-# 1. 패키지 설치
-npm install
-
-# 2. 환경 파일 생성
+# 1. 환경 파일 생성
 cp .env.example .env
+
+# 2. 패키지 설치
+npm install
 
 # 3. Prisma를 이용해 DB 초기화
 npx prisma migrate dev --name init
