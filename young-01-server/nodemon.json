@@ -2,5 +2,5 @@
     "watch": ["src"],
     "ext": "ts,json",
     "ignore": ["node_modules", "dist"],
-    "exec": "node src/server.js"
+    "exec": "ts-node --project tsconfig.json src/server.ts"
 }

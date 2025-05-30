@@ -1,14 +1,14 @@
-const jwt = require('jsonwebtoken');
-const jwtConfig = require('@config/jwt');
-const redis = require('@lib/redis');
+import jwt from 'jsonwebtoken';
+import jwtConfig from '@config/jwt';
 
+import { UserResponseDto } from '@shared/types/user/user.types';
 /**
  * 사용자 정보로 accessToken 생성
  */
-exports.signAccessToken = (user) => {
+export const signAccessToken = (user: UserResponseDto) => {
     const payload = {
         id: user.id,
-        groups: user.Groups?.map((g) => g.name),
+        groups: user.groups,
     };
 
     return jwt.sign(payload, jwtConfig.secret, {
@@ -19,7 +19,7 @@ exports.signAccessToken = (user) => {
 /**
  * userId로 refreshToken 생성
  */
-exports.signRefreshToken = (userId) => {
+export const signRefreshToken = (userId: number) => {
     const payload = { id: userId };
     return jwt.sign(payload, jwtConfig.secret, {
         expiresIn: Number(jwtConfig.refreshExpiresIn),
@@ -29,6 +29,6 @@ exports.signRefreshToken = (userId) => {
 /**
  * 토큰 검증
  */
-exports.verifyToken = (token) => {
-    return jwt.verify(token, jwtConfig.secret);
+export const verifyToken = (token: string): UserResponseDto => {
+    return jwt.verify(token, jwtConfig.secret) as UserResponseDto;
 };

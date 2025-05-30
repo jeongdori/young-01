@@ -1,15 +1,15 @@
-@access_token = eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTQsImdyb3VwcyI6W10sImlhdCI6MTc0NzI5NzM5NiwiZXhwIjoxNzQ3Mjk5MTk2fQ.G2hBnYtxeMWnd-HGmDpO8yMD7yJsIk1J-bLeVzDhHQc
+@access_token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTQsImdyb3VwcyI6W10sImlhdCI6MTc0ODU3OTY5NSwiZXhwIjoxNzQ4NTgxNDk1fQ.7v9qK4hBA2KtTWNEKmFzDs7B2BnzmSs4vrSAoI9ReA0
 
 ### 내 정보 조회
-GET http://localhost:3000/users/me
-Authorization: Bearer {{access_token}}
-
+GET http://localhost:3000/user/me
+Cookie: accessToken={{access_token}}
+Content-Type: application/json
 ###
 
 ### 내 정보 수정
-PUT http://localhost:3000/users/me
-Authorization: Bearer {{access_token}}
+PUT http://localhost:3000/user/me
 Content-Type: application/json
+Cookie: accessToken={{access_token}}
 
 {
   "name": "변경된 이름",
@@ -19,11 +19,10 @@ Content-Type: application/json
 ###
 
 ### 사용자 전체 목록 (관리자만 가능 시 adminOnlyMiddleware 필요)
-GET http://localhost:3000/users
-Authorization: Bearer {{access_token}}
-
+GET http://localhost:3000/user
+Cookie: accessToken={{access_token}}
 ###
 
 ### 특정 사용자 조회 (id: 1)
-GET http://localhost:3000/users/1
-Authorization: Bearer {{access_token}}
+GET http://localhost:3000/user/1
+Cookie: accessToken={{access_token}}

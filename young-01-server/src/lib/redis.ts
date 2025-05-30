@@ -1,7 +1,7 @@
-const { createClient } = require('redis');
-const redisConfig = require('@config/redis');
+import { createClient } from 'redis';
+import redisConfig from '@config/redis';
 
-const redis = createClient({
+export const redis = createClient({
     url: redisConfig.url,
 });
 
@@ -11,31 +11,21 @@ redis.on('error', (err) => console.error('Redis Client Error', err));
     await redis.connect();
 })();
 
-const get = async (key) => {
+export const get = async (key: string) => {
     return await redis.get(key);
 };
 
-const getJSON = async (key) => {
+export const getJSON = async (key: string) => {
     const raw = await get(key);
     return raw ? JSON.parse(raw) : null;
 };
 
-const set = async (key, value, options = {}) => {
+export const set = async (key: string, value: string, options = {}) => {
     return await redis.set(key, value, options);
 };
 
-const setJSON = (key, obj, options = {}) =>
-    set(key, JSON.stringify(obj), options);
+export const setJSON = (key: string, obj: any, options = {}) => set(key, JSON.stringify(obj), options);
 
-const del = async (key) => {
+export const del = async (key: string) => {
     return await redis.del(key);
-};
-
-module.exports = {
-    redis,
-    get,
-    getJSON,
-    set,
-    setJSON,
-    del,
 };

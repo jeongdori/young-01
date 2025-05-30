@@ -1,4 +1,6 @@
-module.exports = (req, res, next) => {
+import { Request, Response, NextFunction } from 'express';
+
+export default (req: Request, res: Response, next: NextFunction) => {
     const isAdmin = req.user?.groups?.includes('admin');
     if (!isAdmin) {
         return res.status(403).json({

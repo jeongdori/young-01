@@ -1,7 +1,7 @@
-const request = require('supertest');
-const app = require('@/app');
+import request from 'supertest';
+import app from '@/app';
 
-let accessToken;
+let accessToken: string;
 
 beforeAll(async () => {
     const res = await request(app).post('/auth/login').send({

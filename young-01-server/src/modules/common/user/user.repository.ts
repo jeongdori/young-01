@@ -1,17 +1,33 @@
-const { User } = require('@models');
+import { prisma } from '@/lib/prisma';
+import { User, UserUpdateDto } from '@shared/types/user/user.types';
 
-exports.findAllUsers = () => {
-    return User.findAll({});
+export const findUserAll = (): Promise<User[]> => {
+    return prisma.user.findMany({ select: { id: true, name: true, email: true } });
 };
 
-exports.findUserById = (id) => {
-    return User.findOne({ where: { id } });
+export const findUser = (id: number): Promise<User | null> => {
+    return prisma.user.findUnique({ where: { id }, select: { id: true, name: true, email: true } });
 };
 
-exports.updateUser = (id, { name, email }) => {
-    return User.update({ name, email }, { where: { id } });
+export const updateUser = (id: number, data: UserUpdateDto): Promise<User> => {
+    return prisma.user.update({
+        where: { id },
+        data,
+        select: {
+            id: true,
+            name: true,
+            email: true,
+        },
+    });
 };
 
-exports.deleteUser = (id) => {
-    return User.destroy({ where: { id } });
+export const deleteUser = (id: number): Promise<User> => {
+    return prisma.user.delete({
+        where: { id },
+        select: {
+            id: true,
+            name: true,
+            email: true,
+        },
+    });
 };

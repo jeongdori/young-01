@@ -1,0 +1,42 @@
+generator client {
+  provider = "prisma-client-js"
+  // output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                Int            @id @default(autoincrement())
+  email             String?        @unique(map: "email") @db.VarChar(255)
+  password          String?        @db.VarChar(255)
+  name              String?        @db.VarChar(100)
+
+  userGroupMappings UserGroupMap[]
+
+  @@map("users")
+}
+
+model Group {
+  id                Int            @id @default(autoincrement())
+  name              String         @unique(map: "name") @db.VarChar(50)
+  description       String?        @db.VarChar(255)
+
+  userGroupMappings UserGroupMap[]
+
+  @@map("auth_groups")
+}
+
+model UserGroupMap {
+  user_id  Int
+  group_id Int
+  user     User  @relation(fields: [user_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "user_group_map_ibfk_1")
+  group    Group @relation(fields: [group_id], references: [id], onDelete: Cascade, onUpdate: NoAction, map: "user_group_map_ibfk_2")
+
+  @@id([user_id, group_id])
+  @@index([group_id], map: "group_id")
+  @@index([user_id], map: "user_id")
+  @@map("user_group_map")
+}

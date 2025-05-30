@@ -1,6 +1,7 @@
-const userRepo = require('./user.repository');
+import { findUserAll, findUser, updateUser, deleteUser } from './user.repository';
+import { UserUpdateDto } from '@shared/types/user/user.types';
 
-exports.findAll = () => userRepo.findAllUsers();
-exports.findById = (id) => userRepo.findUserById(id);
-exports.update = (id, data) => userRepo.updateUser(id, data);
-exports.delete = (id) => userRepo.deleteUser(id);
+export const findAll = () => findUserAll();
+export const findById = (id: number) => findUser(id);
+export const update = (id: number, data: UserUpdateDto) => updateUser(id, data);
+export const deleteById = (id: number) => deleteUser(id);

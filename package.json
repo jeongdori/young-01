@@ -1,0 +1,9 @@
+{
+  "name": "young-01",
+  "private": true,
+  "workspaces": [
+    "young-01-client",
+    "young-01-server",
+    "shared"
+  ]
+}

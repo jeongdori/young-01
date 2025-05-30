@@ -1,12 +1,14 @@
-const jwt = require('jsonwebtoken');
-const { resError } = require('@utils/response');
-const jwtConfig = require('@config/jwt');
+import { Request, Response, NextFunction } from 'express';
+import jwt from 'jsonwebtoken';
+import { resError } from '@/utils/response';
+import jwtConfig from '@/config/jwt';
+
+import { UserResponseDto } from '@shared/types/user/user.types';
 
 // 인증 예외 경로
 const publicPaths = ['/public-key', '/login', '/register', '/refresh'];
 
-module.exports = (req, res, next) => {
-    console.log('Request Path:', req.path);
+const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
     if (publicPaths.includes(req.path)) {
         return next(); // 예외 경로는 통과
     }
@@ -17,18 +19,24 @@ module.exports = (req, res, next) => {
         return resError(res, 'NO_TOKEN', 401);
     }
 
-    jwt.verify(token, jwtConfig.secret, (err, decoded) => {
-        if (err) {
-            if (err.name === 'TokenExpiredError') {
-                // 재발급 시도 가능
-                return resError(res, 'TOKEN_EXPIRED', 401);
-            } else {
-                // 서명 위조, 포맷 오류 등
-                return resError(res, 'INVALID_TOKEN', 403);
+    jwt.verify(
+        token,
+        jwtConfig.secret,
+        (err: jwt.VerifyErrors | null, decoded: string | jwt.JwtPayload | undefined) => {
+            if (err) {
+                if (err.name === 'TokenExpiredError') {
+                    // 재발급 시도 가능
+                    return resError(res, 'TOKEN_EXPIRED', 401);
+                } else {
+                    // 서명 위조, 포맷 오류 등
+                    return resError(res, 'INVALID_TOKEN', 403);
+                }
             }
-        }
 
-        req.user = decoded;
-        next();
-    });
+            req.user = decoded as UserResponseDto; // 타입 단언
+            next();
+        },
+    );
 };
+
+export default authMiddleware;

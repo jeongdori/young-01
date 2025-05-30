@@ -1,17 +1,17 @@
 ### 회원가입
-POST http://localhost:3000/auth/register
+POST http://localhost:3000/register
 Content-Type: application/json
 
 {
-  "email": "user6@example.com",
-  "password": "qwer1234",
+  "email": "user7@example.com",
+  "password": "Qwer!234",
   "name": "테스터"
 }
 
 ###
 
 ### 로그인
-POST http://localhost:3000/auth/login
+POST http://localhost:3000/login
 Content-Type: application/json
 
 {
@@ -22,4 +22,5 @@ Content-Type: application/json
 ###
 
 ### Access Token 재발급 (Refresh Token은 쿠키로 보내야 함)
-POST http://localhost:3000/auth/refresh
+POST http://localhost:3000/refresh
+

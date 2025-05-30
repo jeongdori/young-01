@@ -1,37 +1,97 @@
-const { User, Group } = require('@models');
+import { prisma, Prisma, PrismaClient } from '@/lib/prisma';
+import {
+    User,
+    UserLoginDto,
+    UserResponseDto,
+    UserExistsDto,
+    UserRegisterDto,
+    Group,
+    UserGroupMap,
+} from '@shared/types/user/user.types';
 
-exports.findUserWithGroupsByEmail = async (email) => {
-    return User.findOne({
+export const findUserForLogin = async (email: string): Promise<UserLoginDto | null> => {
+    const user = await prisma.user.findUnique({
         where: { email },
         include: {
-            model: Group,
-            through: { attributes: [] }, // join 테이블 필드 제외
+            userGroupMappings: {
+                include: {
+                    group: {
+                        select: {
+                            name: true,
+                        },
+                    },
+                },
+            },
         },
     });
+
+    if (!user) return null;
+
+    return {
+        id: user.id,
+        name: user.name ?? '',
+        password: user.password ?? '',
+        email: user.email ?? '',
+        groups: user.userGroupMappings.map(
+            (map: (typeof user.userGroupMappings)[number]) => map.group.name,
+        ),
+    };
 };
 
-exports.findUserWithGroupsById = async (id) => {
-    return User.findOne({
+export const findUserForToken = async (id: number): Promise<UserResponseDto | null> => {
+    const user = await prisma.user.findUnique({
         where: { id },
-        attributes: { exclude: ['password'] },
-        include: {
-            model: Group,
-            through: { attributes: [] },
+        select: {
+            id: true,
+            name: true,
+            email: true,
+            userGroupMappings: {
+                select: {
+                    group: {
+                        select: {
+                            name: true,
+                        },
+                    },
+                },
+            },
         },
     });
+
+    if (!user) return null;
+
+    return {
+        id: user.id,
+        name: user.name ?? '',
+        email: user.email ?? '',
+        groups: user.userGroupMappings.map(
+            (map: (typeof user.userGroupMappings)[number]) => map.group.name,
+        ),
+    };
 };
 
-exports.findUserByEmail = (email) => {
-    return User.findOne({
+export const findUserForExists = (email: string): Promise<UserExistsDto | null> => {
+    return prisma.user.findUnique({
         where: { email },
-        attributes: { include: ['password'] },
+        select: { id: true },
     });
 };
 
-exports.createUser = ({ email, password, name }) => {
-    return User.create({ email, password, name });
+export const createUser = (
+    tx: Prisma.TransactionClient | PrismaClient = prisma,
+    data: UserRegisterDto,
+): Promise<User> => {
+    return tx.user.create({ data, select: { id: true, email: true, name: true } });
 };
 
-exports.findGroupByName = (name) => {
-    return Group.findOne({ where: { name } });
+export const findGroup = (
+    tx: Prisma.TransactionClient | PrismaClient = prisma,
+    name: string,
+): Promise<Group | null> => {
+    return tx.group.findUnique({ where: { name }, select: { id: true, name: true } });
+};
+export const createUserGroupMap = (
+    tx: Prisma.TransactionClient | PrismaClient = prisma,
+    data: UserGroupMap,
+): Promise<UserGroupMap | null> => {
+    return tx.userGroupMap.create({ data });
 };

@@ -1,12 +1,19 @@
-const { resSuccess, resError } = require('@utils/response');
-const { requireFields } = require('@utils/validate');
+import { Request, Response } from 'express';
+import { resSuccess, resError } from '@utils/response';
 
-const userService = require('./user.service');
+import { UserUpdateDto } from '@shared/types/user/user.types';
 
-exports.findMe = async (req, res) => {
+import {
+    findById as findByIdUser,
+    update as updateUser,
+    deleteById as deleteUser,
+    findAll as findAllUsers,
+} from './user.service';
+
+export const findMe = async (req: Request, res: Response) => {
     try {
         const userId = req.user.id;
-        const user = await userService.findById(userId);
+        const user = await findByIdUser(userId);
         if (!user) return resError(res, '사용자를 찾을 수 없습니다', 404);
         resSuccess(res, user);
     } catch (err) {
@@ -14,12 +21,12 @@ exports.findMe = async (req, res) => {
     }
 };
 
-exports.updateMe = async (req, res) => {
+export const updateMe = async (req: Request, res: Response) => {
     try {
         const userId = req.user.id;
-        const { name, email } = req.validatedBody;
+        const { name, email } = req.body!;
 
-        const updated = await userService.update(userId, { name, email });
+        const updated = await updateUser(userId, { name, email });
         if (!updated) return resError(res, '수정 대상이 없습니다', 404);
 
         resSuccess(res, null, '수정 완료');
@@ -28,10 +35,10 @@ exports.updateMe = async (req, res) => {
     }
 };
 
-exports.deleteMe = async (req, res) => {
+export const deleteMe = async (req: Request, res: Response) => {
     try {
         const userId = req.user.id;
-        const deleted = await userService.delete(userId);
+        const deleted = await deleteUser(userId);
         if (!deleted) return resError(res, '삭제 대상 없음', 404);
         resSuccess(res, null, '삭제 완료');
     } catch (err) {
@@ -39,18 +46,21 @@ exports.deleteMe = async (req, res) => {
     }
 };
 
-exports.findAll = async (req, res) => {
+export const findAll = async (req: Request, res: Response) => {
     try {
-        const users = await userService.findAll();
+        const users = await findAllUsers();
         resSuccess(res, users);
     } catch (err) {
         resError(res, err);
     }
 };
 
-exports.findById = async (req, res) => {
+export const findById = async (req: Request, res: Response) => {
     try {
-        const user = await userService.findById(req.params.id);
+        const userId = Number(req.params.id);
+        if (isNaN(userId)) return resError(res, '사용자를 찾을 수 없습니다', 404);
+
+        const user = await findByIdUser(userId);
         if (!user) return resError(res, '사용자를 찾을 수 없습니다', 404);
         resSuccess(res, user);
     } catch (err) {
@@ -58,10 +68,12 @@ exports.findById = async (req, res) => {
     }
 };
 
-exports.update = async (req, res) => {
+export const update = async (req: Request, res: Response) => {
     try {
-        requireFields(req.body, ['name', 'email']);
-        const updated = await userService.update(req.params.id, req.body);
+        const userId = Number(req.params.id);
+        if (isNaN(userId)) return resError(res, '사용자를 찾을 수 없습니다', 404);
+
+        const updated = await updateUser(userId, req.body);
         if (!updated) return resError(res, '수정 대상 없음', 404);
         resSuccess(res, null, '수정 완료');
     } catch (err) {
@@ -69,9 +81,12 @@ exports.update = async (req, res) => {
     }
 };
 
-exports.delete = async (req, res) => {
+export const deleteById = async (req: Request, res: Response) => {
     try {
-        const deleted = await userService.delete(req.params.id);
+        const userId = Number(req.params.id);
+        if (isNaN(userId)) return resError(res, '사용자를 찾을 수 없습니다', 404);
+
+        const deleted = await deleteUser(userId);
         if (!deleted) return resError(res, '삭제 대상 없음', 404);
         resSuccess(res, null, '삭제 완료');
     } catch (err) {

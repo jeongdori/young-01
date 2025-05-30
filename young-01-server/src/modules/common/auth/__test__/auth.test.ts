@@ -1,5 +1,5 @@
-const request = require('supertest');
-const app = require('@/app');
+import request from 'supertest';
+import app from '@/app';
 
 describe('Auth API', () => {
     it.skip('POST /auth/register - 회원가입 성공', async () => {

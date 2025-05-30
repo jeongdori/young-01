@@ -1,0 +1,14 @@
+{
+  "files": [],
+  "references": [
+    { "path": "shared" },
+    { "path": "young-01-client" },
+    { "path": "young-01-server" }
+  ],
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["shared/*"]
+    }
+  }
+}

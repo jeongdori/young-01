@@ -1,18 +1,26 @@
-const express = require('express');
-const router = express.Router();
-const validate = require('@middlewares/validate');
+import { Router } from 'express';
+const router = Router();
+import validate from '@middlewares/validate';
 
-const userController = require('./user.controller');
-const { userSchema } = require('./user.schema');
+import {
+    findMe,
+    updateMe,
+    deleteMe,
+    findAll,
+    findById,
+    update,
+    deleteById,
+} from './user.controller';
+import { updateSchema } from '@shared/types/user/user.schema';
 
-router.get('/me', userController.findMe);
-router.put('/me', validate(userSchema), userController.updateMe);
-router.patch('/me', userController.deleteMe); // 삭제
+router.get('/me', findMe);
+router.put('/me', validate(updateSchema), updateMe);
+router.patch('/me', deleteMe); // 삭제
 
-router.get('/', userController.findAll); // 목록 조회
-router.get('/:id', userController.findById); // 상세 조회
+router.get('/', findAll); // 목록 조회
+router.get('/:id', findById); // 상세 조회
 // router.post('/', validate(userSchema), userController.create); // 신규 등록
-router.put('/:id', validate(userSchema), userController.update); // 수정
-router.patch('/:id', userController.delete); // 삭제
+router.put('/:id', validate(updateSchema), update); // 수정
+router.patch('/:id', deleteById); // 삭제
 
-module.exports = router;
+export default router;

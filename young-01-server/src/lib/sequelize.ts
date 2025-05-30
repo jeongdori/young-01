@@ -1,15 +1,18 @@
-const { Sequelize } = require('sequelize');
-const dbConfig = require('@config/db');
+import { Sequelize } from 'sequelize-typescript';
+import dbConfig from '@config/db';
 
-const sequelize = new Sequelize(
-    dbConfig.dbName,
-    dbConfig.dbUser,
-    dbConfig.dbPass,
-    {
-        host: process.env.DB_HOST,
-        dialect: 'mysql',
-        logging: true,
-    },
-);
+import { User } from '@/modules/common/user/model/User';
+import { Group } from '@/modules/common/user/model/Group';
+import { UserGroupMap } from '@/modules/common/user/model/UserGroupMap';
 
-module.exports = sequelize;
+const sequelize = new Sequelize({
+    database: dbConfig.dbName!,
+    username: dbConfig.dbUser!,
+    password: dbConfig.dbPass!,
+    host: dbConfig.dbHost!,
+    dialect: 'mysql',
+    logging: true,
+    models: [User, Group, UserGroupMap],
+});
+
+export default sequelize;

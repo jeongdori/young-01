@@ -1,3 +1,6 @@
+import { Request, Response, NextFunction } from 'express';
+import createError, { HttpError } from 'http-errors';
+
 /**
  * 성공 응답 유틸
  * @param {Response} res
@@ -5,7 +8,7 @@
  * @param {string} message
  * @param {number} status
  */
-exports.resSuccess = (res, data, message = 'success', status = 200) => {
+export const resSuccess = (res: Response, data: any, message = 'success', status = 200) => {
     res.status(status).json({
         success: true,
         message,
@@ -20,26 +23,30 @@ exports.resSuccess = (res, data, message = 'success', status = 200) => {
  * @param {number} status - HTTP 상태 코드
  * @param {string} [customMessage] - 강제로 지정할 메시지 (선택)
  */
-exports.resError = (res, error, status, customMessage) => {
+export const resError = (res: Response, error: unknown, status?: number, customMessage?: string) => {
     let message = 'internal server error';
     let httpStatus = status || 500;
+    let stack: string | undefined = undefined;
 
     if (customMessage) {
         message = customMessage;
     } else if (typeof error === 'string') {
         message = error;
-    } else if (error?.message) {
+    } else if (error instanceof Error) {
         message = error.message;
+        stack = error.stack;
 
-        if (error.status || error.statusCode) {
-            httpStatus = error.status || error.statusCode;
+        // http-errors 패키지의 HttpError 객체인 경우
+        const maybeHttpErr = error as Partial<HttpError>;
+        if (maybeHttpErr.status || maybeHttpErr.statusCode) {
+            httpStatus = maybeHttpErr.status || maybeHttpErr.statusCode || httpStatus;
         }
     }
 
     console.error('[resError]', {
         message,
         status: httpStatus,
-        stack: error?.stack || error,
+        stack: stack,
     });
 
     res.status(httpStatus).json({
@@ -55,8 +62,6 @@ exports.resError = (res, error, status, customMessage) => {
  * @param {string} message
  * @returns {Error & {status: number}}
  */
-exports.resCustom = (status, message) => {
-    const err = new Error(message);
-    err.status = status;
-    return err;
+export const resCustom = (status: number, message: string): HttpError => {
+    return createError(status, message);
 };

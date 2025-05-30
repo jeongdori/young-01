@@ -1,14 +1,16 @@
-require('module-alias/register');
-require('@lib/loadEnv');
-require('@lib/redis');
+import 'module-alias/register';
+import '@/lib/loadEnv';
+import '@/lib/redis';
+// import '@models';
 
-const express = require('express');
-const cookieParser = require('cookie-parser');
-const cors = require('cors');
+import express from 'express';
+import cookieParser from 'cookie-parser';
+import cors from 'cors';
+
+import userRoutes from '@/routes/index';
+import authMiddleware from '@/middlewares/authMiddleware';
+
 const app = express();
-
-const userRoutes = require('@routes/index');
-const authMiddleware = require('@middlewares/authMiddleware');
 
 app.use(
     cors({
@@ -22,4 +24,4 @@ app.use(express.json());
 app.use(authMiddleware);
 app.use('/', userRoutes);
 
-module.exports = app;
+export default app;

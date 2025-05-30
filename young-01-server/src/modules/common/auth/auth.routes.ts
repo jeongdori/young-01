@@ -1,18 +1,15 @@
-const express = require('express');
-const router = express.Router();
-const validate = require('@middlewares/validate');
+import { Router } from 'express';
+const router = Router();
+import validate from '@middlewares/validate';
 
-const {
-    loginSchema,
-    registerSchema,
-} = require('@modules/common/user/user.schema');
+import { loginSchema, registerSchema } from '@shared/types/user/user.schema';
 
-const authController = require('./auth.controller');
-router.get('/public-key', authController.getPublicKey);
-router.post('/login', validate(loginSchema), authController.login);
-router.post('/logout', authController.logout);
+import { getPublicKey, login, logout, register, refresh } from './auth.controller';
+router.get('/public-key', getPublicKey);
+router.post('/login', validate(loginSchema), login);
+router.post('/logout', logout);
 
-router.post('/register', validate(registerSchema), authController.register);
-router.post('/refresh', authController.refresh);
+router.post('/register', validate(registerSchema), register);
+router.post('/refresh', refresh);
 
-module.exports = router;
+export default router;

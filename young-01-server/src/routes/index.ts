@@ -1,5 +1,5 @@
-const express = require('express');
-const router = express.Router();
+import { Router } from 'express';
+const router = Router();
 
 /**
  *
@@ -7,7 +7,7 @@ const router = express.Router();
  *
  */
 
-const authRoutes = require('@/modules/common/auth/auth.routes');
+import authRoutes from '@/modules/common/auth/auth.routes';
 
 /**
  *
@@ -16,9 +16,9 @@ const authRoutes = require('@/modules/common/auth/auth.routes');
  */
 
 // user
-const userRoutes = require('@/modules/common/user/user.routes');
+import userRoutes from '@/modules/common/user/user.routes';
 
 router.use('/', authRoutes);
 router.use('/user', userRoutes);
 
-module.exports = router;
+export default router;
