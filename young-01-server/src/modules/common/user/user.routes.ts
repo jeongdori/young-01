@@ -1,6 +1,6 @@
 import { Router } from 'express';
 const router = Router();
-import validate from '@middlewares/validate';
+import validate from '@/middlewares/validate';
 
 import {
     findMe,

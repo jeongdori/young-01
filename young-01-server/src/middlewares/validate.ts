@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
-import { resError } from '@utils/response';
+import { resError } from '@/utils/response';
 
 /**
  * Express 미들웨어로 요청의 body, query, params를 Zod 스키마로 검증합니다.

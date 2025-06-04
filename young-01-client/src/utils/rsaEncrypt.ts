@@ -3,10 +3,8 @@ export const importRSAPublicKey = async (pem: string): Promise<CryptoKey> => {
         .replace('-----BEGIN PUBLIC KEY-----', '')
         .replace('-----END PUBLIC KEY-----', '')
         .replace(/\s/g, '');
-    console.log('Importing RSA Public Key:', b64);
 
     const binaryDer = Uint8Array.from(atob(b64), (c) => c.charCodeAt(0));
-    console.log('Importing RSA Public Key:', binaryDer);
     return crypto.subtle.importKey(
         'spki',
         binaryDer.buffer,
@@ -15,7 +13,7 @@ export const importRSAPublicKey = async (pem: string): Promise<CryptoKey> => {
             hash: 'SHA-256',
         },
         false,
-        ['encrypt']
+        ['encrypt'],
     );
 };
 

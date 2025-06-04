@@ -1,10 +1,10 @@
-import { signAccessToken, signRefreshToken, verifyToken } from '@lib/jwt';
-import jwtConfig from '@config/jwt';
-import { set, get, del } from '@lib/redis';
+import { signAccessToken, signRefreshToken, verifyToken } from '@/lib/jwt';
+import jwtConfig from '@/config/jwt';
+import { set, get, del } from '@/lib/redis';
 
 import { UserResponseDto } from '@shared/types/user/user.types';
 
-import { resCustom } from '@utils/response';
+import { resCustom } from '@/utils/response';
 
 /**
  * access + refresh token 발급 + 저장

@@ -2,12 +2,7 @@ import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 import { UserLoginDto } from '@shared/types/user/user.types';
 
-interface AuthState {
-    user: UserLoginDto | null;
-    isAuthenticated: boolean;
-    login: (user: UserLoginDto) => void;
-    logout: () => void;
-}
+import type { AuthState } from '@/types/index';
 
 const useAuth = create<AuthState>()(
     persist(

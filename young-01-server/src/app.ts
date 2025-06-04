@@ -1,7 +1,6 @@
 import 'module-alias/register';
 import '@/lib/loadEnv';
 import '@/lib/redis';
-// import '@models';
 
 import express from 'express';
 import cookieParser from 'cookie-parser';

@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import bcrypt from 'bcrypt';
 import { prisma, Prisma } from '@/lib/prisma';
-import { resCustom } from '@utils/response';
+import { resCustom } from '@/utils/response';
 
 import { UserLoginDto, UserResponseDto } from '@shared/types/user/user.types';
 
@@ -18,9 +18,8 @@ import {
     validateRefreshToken,
     invalidateRefreshToken,
 } from './auth.token.service';
-import e from 'express';
 
-const { generateKeyPairSync, privateDecrypt } = crypto;
+const { generateKeyPairSync } = crypto;
 const { publicKey, privateKey } = generateKeyPairSync('rsa', {
     modulusLength: 2048,
 });
@@ -42,9 +41,9 @@ export const login = async ({ email, password }: UserLoginDto) => {
     const user = await findUserForLogin(email!);
     if (!user) throw resCustom(401, '존재하지 않는 사용자입니다');
 
-    const encryptedPassword = decryptPassword(password);
+    const dncryptedPassword = decryptPassword(password);
 
-    const match = await bcrypt.compare(password, user.password);
+    const match = await bcrypt.compare(dncryptedPassword, user.password);
     if (!match) throw resCustom(401, '비밀번호가 일치하지 않습니다');
 
     const plainUser = {

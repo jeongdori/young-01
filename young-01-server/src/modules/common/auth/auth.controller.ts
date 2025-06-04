@@ -1,7 +1,6 @@
-import { Request, Response, NextFunction } from 'express';
-import { resSuccess, resError, resCustom } from '@utils/response';
+import { Request, Response } from 'express';
+import { resSuccess, resError, resCustom } from '@/utils/response';
 
-import { UserLoginDto, UserRegisterDto } from '@shared/types/user/user.types';
 import {
     getPublicKey as getPublicKeyService,
     login as loginService,

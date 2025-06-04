@@ -1,7 +1,5 @@
 import { Request, Response } from 'express';
-import { resSuccess, resError } from '@utils/response';
-
-import { UserUpdateDto } from '@shared/types/user/user.types';
+import { resSuccess, resError } from '@/utils/response';
 
 import {
     findById as findByIdUser,

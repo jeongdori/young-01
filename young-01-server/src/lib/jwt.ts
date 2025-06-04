@@ -1,5 +1,5 @@
 import jwt from 'jsonwebtoken';
-import jwtConfig from '@config/jwt';
+import jwtConfig from '@/config/jwt';
 
 import { UserResponseDto } from '@shared/types/user/user.types';
 /**

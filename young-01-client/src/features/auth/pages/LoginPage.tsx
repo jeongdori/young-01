@@ -1,17 +1,19 @@
 import { useForm, FormProvider } from 'react-hook-form';
 import { TextField, Button, Container, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { joiResolver } from '@hookform/resolvers/joi';
+import { zodResolver } from '@hookform/resolvers/zod';
 
 import FormError from '@/components/errors/FormError';
 
 import useLogin from '../hook/useLogin';
-import { loginSchema } from '../schemas/user.schema';
+
+import { UserLoginInputDto } from '@shared/types/user/user.types';
+import { loginSchema } from '@shared/types/user/user.schema';
 
 const LoginPage = () => {
     const methods = useForm({
         mode: 'onSubmit',
-        resolver: joiResolver(loginSchema),
+        resolver: zodResolver(loginSchema),
     });
     const { handleSubmit, register } = methods;
 
@@ -19,7 +21,7 @@ const LoginPage = () => {
 
     const loginMutation = useLogin();
 
-    const onSubmit = (data) => {
+    const onSubmit = (data: UserLoginInputDto) => {
         loginMutation.mutate(data);
     };
 
@@ -43,7 +45,7 @@ const LoginPage = () => {
                         variant="contained"
                         color="primary"
                         fullWidth
-                        disabled={loginMutation.isLoading}
+                        disabled={loginMutation.isPending}
                     >
                         로그인
                     </Button>
@@ -53,7 +55,7 @@ const LoginPage = () => {
                         color="success"
                         fullWidth
                         onClick={onRegisterClick}
-                        disabled={loginMutation.isLoading}
+                        disabled={loginMutation.isPending}
                     >
                         회원가입
                     </Button>

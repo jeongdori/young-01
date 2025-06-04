@@ -1,38 +1,36 @@
 import axios from 'axios';
 import useAuth from '@/stores/auth/useAuth';
 import type { AxiosResponse, AxiosError, AxiosRequestConfig } from 'axios';
-import { isApiSuccess, isApiError, ClientError } from '@/utils/response';
 
+import type { ApiErrorResponse } from '@/types/index';
+import { object } from 'zod';
+
+/**
+ * withCredentials
+ * 크로스 도메인 요청 시 credential 정보 전달 여부(쿠키, Authorization)
+ * 서버에서도 같은 설정 필요
+ */
 const instance = axios.create({
     baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000',
     withCredentials: true,
+    timeout: 20000, //20초
 });
 
 type FailedRequest = {
-    resolve: (value?: unknown) => void;
-    reject: (reason?: any) => void;
+    resolve: (_value?: string | null) => void;
+    reject: (_reason?: unknown) => void;
 };
-
-interface ApiErrorResponse {
-    success: false;
-    message: string;
-    data: null;
-}
-
-interface CustomAxiosRequestConfig extends AxiosRequestConfig {
-    _retry?: boolean;
-}
 
 // 토큰 재발급 여부를 기억하는 변수
 let isRefreshing = false;
 let failedQueue: FailedRequest[] = [];
 
-const processQueue = (error: ClientError | null, token: string | null = null): void => {
-    failedQueue.forEach((prom) => {
+const processQueue = (error: unknown | null, token: string | null = null): void => {
+    failedQueue.forEach(({ resolve, reject }) => {
         if (error) {
-            prom.reject(error);
+            reject(error);
         } else {
-            prom.resolve(token);
+            resolve(token);
         }
     });
     failedQueue = [];
@@ -56,26 +54,39 @@ const redirectToLoginMessages = ['INVALID_TOKEN'];
 
 // 응답 인터셉터
 instance.interceptors.response.use(
-    (response: AxiosResponse): any => {
-        const resData = response.data;
+    (response: AxiosResponse) => {
+        const status = response.status;
+        const raw = response.data;
+        const cfg = response.config;
+        const { method, url, meta } = cfg;
 
-        if (isApiSuccess(resData)) {
-            return resData.data;
+        if (raw.success) {
+            logOnDev(meta?.log, 'log', `🚀 [API] [SUCCESS] ${status} ${method?.toUpperCase()} ${url} → ${raw.message}`);
+
+            return raw.data;
         }
+        logOnDev(
+            meta?.log,
+            'warn',
+            `⚠️ [API] [BUSINESS ERROR] ${status} ${method?.toUpperCase()} ${url} → ${raw.message}`,
+        );
 
-        if (isApiError(resData)) {
-            const err = new Error(resData.message) as ClientError;
-            err.status = response.status;
-            throw err;
-        }
-
-        throw new Error('Invalid API response format');
+        const error = new Error(raw.message) as AxiosError<ApiErrorResponse>;
+        error.response = {
+            ...response,
+            data: raw,
+        };
+        throw error;
     },
-    async (err) => {
-        const error = err as AxiosError<ApiErrorResponse>;
-        const originalRequest = error.config as CustomAxiosRequestConfig;
+    async (error: AxiosError<ApiErrorResponse>) => {
+        const originalRequest = error.config;
+        if (!originalRequest) return Promise.reject(error);
+
+        const { method, url, meta } = originalRequest;
         const status = error.response?.status;
-        const message = error.response?.data?.message;
+        const message = error.response?.data?.message ?? '알 수 없는 오류가 발생했습니다.';
+
+        logOnDev(meta?.log, 'error', `🚨 [API] [ERROR] ${method?.toUpperCase()} ${url} → (${status}) ${message}`);
 
         if (status === 401 && refreshableMessages.includes(message ?? '') && !originalRequest._retry) {
             if (isRefreshing) {
@@ -91,13 +102,14 @@ instance.interceptors.response.use(
                 await instance.post('/refresh', {}, { withCredentials: true });
                 processQueue(null);
                 return instance(originalRequest); // 다시 요청
-            } catch (error) {
-                const err = error as ClientError;
-                processQueue(err);
+            } catch (catchError) {
+                processQueue(catchError);
+                const err = catchError as AxiosError;
                 if (err.response?.status === 403 || err.response?.status === 401) {
                     // 상태 초기화, 로그인 페이지 이동
                     useAuth.getState().logout(); // 상태 초기화 유틸
                     const currentPath = window.location.pathname + window.location.search;
+                    alert('로그인 정보가 만료되었습니다. 다시 로그인해주세요.');
                     window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
                 }
                 return Promise.reject(err);
@@ -109,11 +121,37 @@ instance.interceptors.response.use(
         if (redirectToLoginMessages.includes(message ?? '') || status === 403) {
             useAuth.getState().logout();
             const currentPath = window.location.pathname + window.location.search;
+            alert('권한이 없거나 로그인 정보가 유효하지 않습니다. 로그인 후 다시 시도해주세요.');
             window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
-        }
 
+            return Promise.reject(error);
+        }
+        if (meta?.alert ?? true) alert(`[${status}] 오류가 발생했습니다: ${message}`);
         return Promise.reject(error);
-    }
+    },
 );
+
+export const logOnDev = (log: boolean | undefined, level: 'log' | 'warn' | 'error', msg: string) => {
+    const isLog = log ?? true;
+    if (!isLog) return;
+
+    const mode = import.meta.env.MODE;
+    const modeTag = `[${mode.toUpperCase()}]`;
+    if (mode === 'test' || mode === 'dev') {
+        switch (level) {
+            case 'log':
+                console.log(modeTag, msg);
+                break;
+            case 'warn':
+                console.warn(modeTag, msg);
+                break;
+            case 'error':
+                console.error(modeTag, msg);
+                break;
+            default:
+                console.log(modeTag, msg);
+        }
+    }
+};
 
 export default instance;

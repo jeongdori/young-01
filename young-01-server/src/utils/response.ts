@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from 'express';
+import { Response } from 'express';
 import createError, { HttpError } from 'http-errors';
 
 /**
@@ -8,7 +8,7 @@ import createError, { HttpError } from 'http-errors';
  * @param {string} message
  * @param {number} status
  */
-export const resSuccess = (res: Response, data: any, message = 'success', status = 200) => {
+export const resSuccess = (res: Response, data: unknown, message = 'success', status = 200) => {
     res.status(status).json({
         success: true,
         message,
@@ -23,7 +23,12 @@ export const resSuccess = (res: Response, data: any, message = 'success', status
  * @param {number} status - HTTP 상태 코드
  * @param {string} [customMessage] - 강제로 지정할 메시지 (선택)
  */
-export const resError = (res: Response, error: unknown, status?: number, customMessage?: string) => {
+export const resError = (
+    res: Response,
+    error: unknown,
+    status?: number,
+    customMessage?: string,
+) => {
     let message = 'internal server error';
     let httpStatus = status || 500;
     let stack: string | undefined = undefined;

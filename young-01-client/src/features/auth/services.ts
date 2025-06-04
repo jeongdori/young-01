@@ -10,10 +10,10 @@ const authService = {
             withCredentials: true,
         }),
 
-    register: (data: UserRegisterDto) => axios.post(`${defaultPath}/register`, data),
+    register: (data: UserRegisterDto): Promise<null> => axios.post(`${defaultPath}/register`, data),
 
-    refreshAccessToken: () => axios.post(`${defaultPath}/refresh`, {}, { withCredentials: true }),
+    refreshAccessToken: (): Promise<null> => axios.post(`${defaultPath}/refresh`, {}, { withCredentials: true }),
 
-    logout: () => axios.post(`${defaultPath}/logout`, {}, { withCredentials: true }),
+    logout: (): Promise<null> => axios.post(`${defaultPath}/logout`, {}, { withCredentials: true }),
 };
 export default authService;
