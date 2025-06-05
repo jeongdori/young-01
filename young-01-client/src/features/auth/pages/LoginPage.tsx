@@ -3,42 +3,73 @@ import { TextField, Button, Container, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import FormError from '@/components/errors/FormError';
-
+// util
 import useLogin from '../hook/useLogin';
 
+// types/schema
 import { UserLoginInputDto } from '@shared/types/user/user.types';
 import { loginSchema } from '@shared/types/user/user.schema';
 
+// components
+import FormError from '@/components/errors/FormError';
+
 const LoginPage = () => {
-    const methods = useForm({
+    // ──────────────────────────────────────────────────────────────
+    // constants
+
+    // ──────────────────────────────────────────────────────────────
+    // states/hook
+    const form = useForm({
         mode: 'onSubmit',
         resolver: zodResolver(loginSchema),
     });
-    const { handleSubmit, register } = methods;
-
-    const navigate = useNavigate();
+    const { handleSubmit, register } = form;
 
     const loginMutation = useLogin();
 
-    const onSubmit = (data: UserLoginInputDto) => {
-        loginMutation.mutate(data);
-    };
+    // ──────────────────────────────────────────────────────────────
+    // Derived Values
 
-    const onRegisterClick = () => {
+    // ──────────────────────────────────────────────────────────────
+    // helpers
+
+    // ──────────────────────────────────────────────────────────────
+    // handlers
+
+    // ──────────────────────────────────────────────────────────────
+    // routing
+    const navigate = useNavigate();
+    const goToRegister = () => {
         navigate('/register');
     };
 
+    // ──────────────────────────────────────────────────────────────
+    // submit/api call
+    const onLoginSubmit = (data: UserLoginInputDto) => {
+        loginMutation.mutate(data);
+    };
+
+    // ──────────────────────────────────────────────────────────────
+    //  Render Guards
+
+    // ──────────────────────────────────────────────────────────────
+    // jsx
     return (
         <Container maxWidth="xs">
             <Typography variant="h5" align="center" gutterBottom>
                 Login
             </Typography>
-            <FormProvider {...methods}>
-                <form onSubmit={handleSubmit(onSubmit)}>
+            <FormProvider {...form}>
+                <form onSubmit={handleSubmit(onLoginSubmit)}>
                     <TextField label="Email" fullWidth margin="normal" {...register('email')} />
                     <FormError name="email" />
-                    <TextField label="Password" type="password" fullWidth margin="normal" {...register('password')} />
+                    <TextField
+                        label="Password"
+                        type="password"
+                        fullWidth
+                        margin="normal"
+                        {...register('password')}
+                    />
                     <FormError name="password" />
                     <Button
                         type="submit"
@@ -54,7 +85,7 @@ const LoginPage = () => {
                         variant="contained"
                         color="success"
                         fullWidth
-                        onClick={onRegisterClick}
+                        onClick={goToRegister}
                         disabled={loginMutation.isPending}
                     >
                         회원가입

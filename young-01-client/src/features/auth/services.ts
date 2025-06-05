@@ -2,6 +2,9 @@ import axios from '@/api/axios';
 
 import { UserLoginInputDto, UserLoginDto, UserRegisterDto } from '@shared/types/user/user.types';
 
+const authMeta = {
+    meta: { alert: false },
+};
 const defaultPath = '';
 const authService = {
     getPublicKey: (): Promise<{ publicKey: string }> => axios.get('/public-key'),
@@ -12,7 +15,8 @@ const authService = {
 
     register: (data: UserRegisterDto): Promise<null> => axios.post(`${defaultPath}/register`, data),
 
-    refreshAccessToken: (): Promise<null> => axios.post(`${defaultPath}/refresh`, {}, { withCredentials: true }),
+    refreshAccessToken: (): Promise<null> =>
+        axios.post(`${defaultPath}/refresh`, {}, { withCredentials: true }),
 
     logout: (): Promise<null> => axios.post(`${defaultPath}/logout`, {}, { withCredentials: true }),
 };

@@ -1,9 +1,12 @@
 import axios from 'axios';
-import useAuth from '@/stores/auth/useAuth';
 import type { AxiosResponse, AxiosError, AxiosRequestConfig } from 'axios';
 
+// type
 import type { ApiErrorResponse } from '@/types/index';
-import { object } from 'zod';
+
+// store
+import useAuthStore from '@/stores/auth/authStore';
+import useErrorStore from '@/stores/error/errorStore';
 
 /**
  * withCredentials
@@ -16,6 +19,28 @@ const instance = axios.create({
     timeout: 20000, //20초
 });
 
+// ──────────────────────────────────────────────────────────────
+// 요청 인터셉터 구성
+const DEFAULT_META = {
+    alert: true,
+    log: true,
+} as const;
+
+// ──────────────────────────────────────────────────────────────
+// 요청 인터셉터
+instance.interceptors.request.use(
+    (config) => {
+        config.meta = {
+            ...DEFAULT_META,
+            ...config.meta,
+        };
+        return config;
+    },
+    (error) => Promise.reject(error),
+);
+
+// ──────────────────────────────────────────────────────────────
+// 응답 인터셉터 구성
 type FailedRequest = {
     resolve: (_value?: string | null) => void;
     reject: (_reason?: unknown) => void;
@@ -25,6 +50,7 @@ type FailedRequest = {
 let isRefreshing = false;
 let failedQueue: FailedRequest[] = [];
 
+// refresh 중 요청 담기
 const processQueue = (error: unknown | null, token: string | null = null): void => {
     failedQueue.forEach(({ resolve, reject }) => {
         if (error) {
@@ -36,22 +62,11 @@ const processQueue = (error: unknown | null, token: string | null = null): void 
     failedQueue = [];
 };
 
-// 요청 인터셉터
-// instance.interceptors.request.use(
-//   (request) => {
-//     console.log("request success:", request);
-//     return request;
-//   },
-//   (error) => {
-//     console.log("Response error:", error);
-
-//     return error;
-//   }
-// );
-
+// 분기 처리할 응답 메세지
 const refreshableMessages = ['NO_TOKEN', 'TOKEN_EXPIRED', 'jwt expired'];
 const redirectToLoginMessages = ['INVALID_TOKEN'];
 
+// ──────────────────────────────────────────────────────────────
 // 응답 인터셉터
 instance.interceptors.response.use(
     (response: AxiosResponse) => {
@@ -61,7 +76,11 @@ instance.interceptors.response.use(
         const { method, url, meta } = cfg;
 
         if (raw.success) {
-            logOnDev(meta?.log, 'log', `🚀 [API] [SUCCESS] ${status} ${method?.toUpperCase()} ${url} → ${raw.message}`);
+            logOnDev(
+                meta?.log,
+                'log',
+                `🚀 [API] [SUCCESS] ${status} ${method?.toUpperCase()} ${url} → ${raw.message}`,
+            );
 
             return raw.data;
         }
@@ -86,9 +105,19 @@ instance.interceptors.response.use(
         const status = error.response?.status;
         const message = error.response?.data?.message ?? '알 수 없는 오류가 발생했습니다.';
 
-        logOnDev(meta?.log, 'error', `🚨 [API] [ERROR] ${method?.toUpperCase()} ${url} → (${status}) ${message}`);
+        logOnDev(
+            meta?.log,
+            'error',
+            `🚨 [API] [ERROR] ${method?.toUpperCase()} ${url} → (${status}) ${message}`,
+        );
 
-        if (status === 401 && refreshableMessages.includes(message ?? '') && !originalRequest._retry) {
+        // ──────────────────────────────────────────────────────────────
+        // refresh
+        if (
+            status === 401 &&
+            refreshableMessages.includes(message ?? '') &&
+            !originalRequest._retry
+        ) {
             if (isRefreshing) {
                 return new Promise((resolve, reject) => {
                     failedQueue.push({ resolve, reject });
@@ -101,13 +130,18 @@ instance.interceptors.response.use(
             try {
                 await instance.post('/refresh', {}, { withCredentials: true });
                 processQueue(null);
-                return instance(originalRequest); // 다시 요청
+
+                // 다시 요청
+                return instance({
+                    ...originalRequest,
+                    headers: { ...(originalRequest.headers || {}) },
+                });
             } catch (catchError) {
                 processQueue(catchError);
                 const err = catchError as AxiosError;
                 if (err.response?.status === 403 || err.response?.status === 401) {
                     // 상태 초기화, 로그인 페이지 이동
-                    useAuth.getState().logout(); // 상태 초기화 유틸
+                    useAuthStore.getState().logout(); // 상태 초기화 유틸
                     const currentPath = window.location.pathname + window.location.search;
                     alert('로그인 정보가 만료되었습니다. 다시 로그인해주세요.');
                     window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
@@ -117,23 +151,47 @@ instance.interceptors.response.use(
                 isRefreshing = false;
             }
         }
+        // ──────────────────────────────────────────────────────────────
 
+        // ──────────────────────────────────────────────────────────────
+        // no auth
         if (redirectToLoginMessages.includes(message ?? '') || status === 403) {
-            useAuth.getState().logout();
+            useAuthStore.getState().logout();
             const currentPath = window.location.pathname + window.location.search;
             alert('권한이 없거나 로그인 정보가 유효하지 않습니다. 로그인 후 다시 시도해주세요.');
             window.location.href = `/login?redirect=${encodeURIComponent(currentPath)}`;
 
             return Promise.reject(error);
         }
-        if (meta?.alert ?? true) alert(`[${status}] 오류가 발생했습니다: ${message}`);
+
+        // error alert or page
+        if (meta?.alert) {
+            if (!originalRequest._retry) alert(`[${status}] 오류 :  ${message}`);
+        } else {
+            useErrorStore.getState().setError({
+                status,
+                statusText: message ?? '알 수 없는 오류입니다.',
+            });
+
+            window.location.href = '/error';
+        }
+
         return Promise.reject(error);
     },
 );
-
-export const logOnDev = (log: boolean | undefined, level: 'log' | 'warn' | 'error', msg: string) => {
-    const isLog = log ?? true;
-    if (!isLog) return;
+/**
+ *
+ * @param log 로그 출력 여부
+ * @param level 로그 레벨 log | warn | error
+ * @param msg 로그 출력 메세지
+ * @returns void
+ */
+export const logOnDev = (
+    log: boolean | undefined,
+    level: 'log' | 'warn' | 'error',
+    msg: string,
+) => {
+    if (!log) return;
 
     const mode = import.meta.env.MODE;
     const modeTag = `[${mode.toUpperCase()}]`;

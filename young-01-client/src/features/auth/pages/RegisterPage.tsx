@@ -1,47 +1,73 @@
 import { useForm, FormProvider } from 'react-hook-form';
 import { TextField, Button, Container, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
-import { useMutation } from '@/lib/QueryClient';
 import { zodResolver } from '@hookform/resolvers/zod';
 
-import FormError from '@/components/errors/FormError';
-
+// util
+import { useMutation } from '@/lib/QueryClient';
 import authService from '../services';
+
+// types/schema
 import { UserRegisterDto } from '@shared/types/user/user.types';
 import { registerSchema } from '@shared/types/user/user.schema';
 
+// components
+import FormError from '@/components/errors/FormError';
+
 const RegisterPage = () => {
+    // ──────────────────────────────────────────────────────────────
+    // constants
+
+    // ──────────────────────────────────────────────────────────────
+    // hook form
     const methods = useForm({
         mode: 'onSubmit',
         resolver: zodResolver(registerSchema),
     });
     const { handleSubmit, register } = methods;
-    const navigate = useNavigate();
 
     const mutation = useMutation<null, UserRegisterDto>({
         mutationFn: authService.register,
         onSuccess: () => {
             alert('회원가입 완료! 로그인해주세요.');
-            navigate('/login');
-        },
-        onError: (error) => {
-            const status = error.response?.status;
-            const message = error.response?.data?.message || '알 수 없는 오류가 발생했습니다.';
-            alert(`[${status}] 회원가입 실패: ${message}`);
+            goToLogin();
         },
     });
 
-    const onSubmit = (data: UserRegisterDto) => {
+    // ──────────────────────────────────────────────────────────────
+    // Derived Values
+
+    // ──────────────────────────────────────────────────────────────
+    // helpers
+
+    // ──────────────────────────────────────────────────────────────
+    // handler
+
+    // ──────────────────────────────────────────────────────────────
+    // routing
+    const navigate = useNavigate();
+    const goToLogin = () => {
+        navigate('/login');
+    };
+
+    // ──────────────────────────────────────────────────────────────
+    // submit/api call
+    const onRegisterSubmit = (data: UserRegisterDto) => {
         mutation.mutate(data);
     };
 
+    // ──────────────────────────────────────────────────────────────
+    //  Render Guards
+
+    // ──────────────────────────────────────────────────────────────
+    // jsx
     return (
         <Container maxWidth="xs">
             <Typography variant="h5" align="center" gutterBottom>
                 회원가입
             </Typography>
             <FormProvider {...methods}>
-                <form onSubmit={handleSubmit(onSubmit)}>
+                <form onSubmit={handleSubmit(onRegisterSubmit)}>
                     <TextField label="이메일" fullWidth margin="normal" {...register('email')} />
                     <FormError name="email" />
 

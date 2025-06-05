@@ -1,4 +1,4 @@
-import { z, requiredString } from "@shared/types/zod";
+import { z, requiredString } from "../zod";
 
 export const loginSchema = z.object({
   email: requiredString("이메일").email("이메일 형식이 아닙니다"),

@@ -1,31 +1,39 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { createBrowserRouter, Navigate } from 'react-router-dom';
 
-import HomeLayout from "@/layouts/HomeLayout";
+import HomeLayout from '@/layouts/home/HomeLayout';
+import ErrorLayout from '@/layouts/errors/ErrorLayout';
+import ApiErrorLayout from '@/layouts/errors/ApiErrorLayout';
 
-import mainRoutes from "./main.routes";
-import authRoutes from "./auth.routes";
-import userRoutes from "./user.routes";
+import App from '@/App';
+import mainRoutes from './main.routes';
+import authRoutes from './auth.routes';
+import userRoutes from './user.routes';
 
-const Router = () => {
-  const homeRoutes = [
-    { path: "/", element: <Navigate to="/main" replace /> },
-    ...mainRoutes,
-    ...authRoutes,
-    ...userRoutes,
-  ];
+const routes = createBrowserRouter([
+    {
+        element: <App />,
+        errorElement: <ErrorLayout />,
+        children: [
+            {
+                element: <HomeLayout />,
+                children: [
+                    { path: '/', element: <Navigate to="/main" replace /> },
 
-  return (
-    <Routes>
-      <Route element={<HomeLayout />}>
-        {homeRoutes.map(({ path, element }, index) => (
-          <Route key={index} path={path} element={element} />
-        ))}
-      </Route>
+                    ...mainRoutes,
+                    ...authRoutes,
+                    ...userRoutes,
+                ],
+            },
+        ],
+    },
+    {
+        path: '/error',
+        element: <ApiErrorLayout />,
+    },
+    // {
+    //     path: '*',
+    //     element: <ErrorBoundaryLayout />,
+    // },
+]);
 
-      {/* 404 */}
-      <Route path="*" element={<div>404 Not Found</div>} />
-    </Routes>
-  );
-};
-
-export default Router;
+export default routes;

@@ -1,6 +1,6 @@
 import { useMutation } from '@/lib/QueryClient';
 import { useNavigate, useLocation } from 'react-router-dom';
-import useAuth from '@/stores/auth/useAuth';
+import useAuthStore from '@/stores/auth/authStore';
 import { importRSAPublicKey, encryptWithRSA } from '@/utils/rsaEncrypt';
 
 import { UserLoginDto, UserLoginInputDto } from '@shared/types/user/user.types';
@@ -11,7 +11,9 @@ const useLogin = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const redirectTo =
-        location.state?.from?.pathname || new URLSearchParams(location.search).get('redirect') || '/main';
+        location.state?.from?.pathname ||
+        new URLSearchParams(location.search).get('redirect') ||
+        '/main';
 
     return useMutation<UserLoginDto, UserLoginInputDto>({
         mutationFn: async (data) => {
@@ -26,7 +28,7 @@ const useLogin = () => {
             });
         },
         onSuccess: (res) => {
-            useAuth.getState().login(res);
+            useAuthStore.getState().login(res);
             navigate(redirectTo, {
                 replace: true,
             });

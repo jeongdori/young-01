@@ -1,15 +1,20 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import { UserLoginDto } from '@shared/types/user/user.types';
+import { UserResponseDto } from '@shared/types/user/user.types';
 
-import type { AuthState } from '@/types/index';
+type AuthState = {
+    user: UserResponseDto | null;
+    isAuthenticated: boolean;
+    login: (user: UserResponseDto) => void;
+    logout: () => void;
+};
 
-const useAuth = create<AuthState>()(
+const useAuthStore = create<AuthState>()(
     persist(
         (set) => ({
             user: null,
             isAuthenticated: false,
-            login: (user: UserLoginDto) => set({ user, isAuthenticated: true }),
+            login: (user: UserResponseDto) => set({ user, isAuthenticated: true }),
             logout: () => {
                 set({ user: null, isAuthenticated: false });
                 document.cookie = 'accessToken=; Max-Age=0; path=/';
@@ -18,8 +23,8 @@ const useAuth = create<AuthState>()(
         }),
         {
             name: 'auth-store',
-        }
-    )
+        },
+    ),
 );
 
-export default useAuth;
+export default useAuthStore;

@@ -1,24 +1,42 @@
 import { useQuery } from '@/lib/QueryClient';
+
+// util
 import userService from '../services';
 
+// components
+
 const UserListPage = () => {
-    const { data, isLoading, error } = useQuery({
+    // ──────────────────────────────────────────────────────────────
+    // constants
+
+    // ──────────────────────────────────────────────────────────────
+    // hook form
+    const { data } = useQuery({
         queryKey: ['user', 'findAll'],
         queryFn: userService.findAll,
         retry: false,
     });
 
-    if (isLoading) return <p>로딩 중...</p>;
-    if (error) {
-        const status = error.response?.status;
-        const message = error.response?.data?.message || '알 수 없는 오류가 발생했습니다.';
-        return (
-            <p>
-                [{status}] 에러: {message}
-            </p>
-        );
-    }
+    // ──────────────────────────────────────────────────────────────
+    // Derived Values
 
+    // ──────────────────────────────────────────────────────────────
+    // helpers
+
+    // ──────────────────────────────────────────────────────────────
+    // handler
+
+    // ──────────────────────────────────────────────────────────────
+    // routing
+
+    // ──────────────────────────────────────────────────────────────
+    // submit/api call
+
+    // ──────────────────────────────────────────────────────────────
+    //  Render Guards
+
+    // ──────────────────────────────────────────────────────────────
+    // jsx
     return (
         <div>
             <h2>유저 목록</h2>

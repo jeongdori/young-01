@@ -1,14 +1,14 @@
 // src/layouts/MainLayout.jsx
 import { AppBar, Toolbar, Typography, Button, Container } from '@mui/material';
 import { Outlet, useNavigate } from 'react-router-dom';
-import useAuth from '@/stores/auth/useAuth'; // 사용자 로그인 상태 관리용
+import useAuthStore from '@/stores/auth/authStore'; // 사용자 로그인 상태 관리용
 
 import GlobalLoader from '@/components/loading/GlobalLoader';
 
 import UserMenu from './components/UserMenu';
 
 const HomeLayout = () => {
-    const { user } = useAuth(); // zustand 기반이라고 가정
+    const { user } = useAuthStore(); // zustand 기반이라고 가정
     const navigate = useNavigate();
 
     return (
