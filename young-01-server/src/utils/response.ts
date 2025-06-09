@@ -1,5 +1,6 @@
 import { Response } from 'express';
 import createError, { HttpError } from 'http-errors';
+import logger from '@/lib/logger';
 
 /**
  * 성공 응답 유틸
@@ -48,7 +49,7 @@ export const resError = (
         }
     }
 
-    console.error('[resError]', {
+    logger.error('[RES ERROR]', {
         message,
         status: httpStatus,
         stack: stack,

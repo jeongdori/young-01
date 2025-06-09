@@ -8,6 +8,7 @@ import cors from 'cors';
 
 import userRoutes from '@/routes/index';
 import authMiddleware from '@/middlewares/authMiddleware';
+import { requestLogger } from '@/middlewares/logMiddleware';
 
 const app = express();
 
@@ -20,6 +21,7 @@ app.use(
 app.use(cookieParser());
 app.use(express.json());
 
+app.use(requestLogger);
 app.use(authMiddleware);
 app.use('/', userRoutes);
 

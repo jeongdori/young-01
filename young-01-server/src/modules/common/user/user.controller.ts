@@ -47,7 +47,6 @@ export const deleteMe = async (req: Request, res: Response) => {
 export const findAll = async (req: Request, res: Response) => {
     try {
         const users = await findAllUsers();
-        throw resCustom(500, '401에러');
         resSuccess(res, users);
     } catch (err) {
         resError(res, err);

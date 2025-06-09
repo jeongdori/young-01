@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express';
 import { z } from 'zod';
 import { resError } from '@/utils/response';
+import logger from '@/lib/logger';
 
 /**
  * Express 미들웨어로 요청의 body, query, params를 Zod 스키마로 검증합니다.
@@ -14,8 +15,8 @@ const validate =
     (schema: z.ZodTypeAny, from: 'body' | 'query' | 'params' = 'body') =>
     (req: Request, res: Response, next: NextFunction) => {
         const result = schema.safeParse(req[from]);
-        console.log('Validation result:', result);
         if (!result.success) {
+            logger.error('Validation success : ', result.success);
             return resError(
                 res,
                 'VALIDATION_ERROR',

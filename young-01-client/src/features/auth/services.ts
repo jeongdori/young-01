@@ -2,7 +2,7 @@ import axios from '@/api/axios';
 
 import { UserLoginInputDto, UserLoginDto, UserRegisterDto } from '@shared/types/user/user.types';
 
-const authMeta = {
+const defaultMeta = {
     meta: { alert: false },
 };
 const defaultPath = '';
