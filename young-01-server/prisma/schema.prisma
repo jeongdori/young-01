@@ -40,3 +40,24 @@ model UserGroupMap {
   @@index([user_id], map: "user_id")
   @@map("user_group_map")
 }
+
+
+model Topic {
+  id         Int      @id @default(autoincrement())
+  parentId   Int?
+  depth      Int      @default(0)
+  isLeaf     Boolean  @default(false)
+  title      String
+  content    String?
+  isUse      Boolean  @default(true)
+  status     String?
+  remark     String?
+  sortOrder  Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  parent     Topic?   @relation("TopicToTopic", fields: [parentId], references: [id])
+  children   Topic[]  @relation("TopicToTopic")
+
+  @@map("note_tree")
+}

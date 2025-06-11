@@ -54,8 +54,15 @@ cp .env.example .env
 npm install
 
 # 3. Prisma를 이용해 DB 초기화
-npx prisma migrate dev --name init
-ex) npx prisma migrate dev --name [migration-name]
+
+# 3-1. prisma 스키마를 소스코드에 반영만 할 때
+npx prisma generate
+
+# 3-2. 스키마 수정 후 마이그레이션 이력을 생성할 때
+npx prisma migrate dev --name [migration-name]
+npx prisma migrate deploy --name [migration-name]
+
+
 ```
 
 -> npm install

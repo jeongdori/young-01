@@ -4,6 +4,9 @@ node_modules/
 # package-lock.json
 package-lock.json
 
+
+
+
 # Logs
 logs/
 *.log
@@ -20,6 +23,8 @@ young-01-client/.vite/
 # backend build output (optional)
 young-01-server/dist/
 young-01-server/build/
+# prisma/migrations - 필요 시
+#young-01-server/prisma/migrations/
 
 # Editor files
 .vscode/*
@@ -40,7 +45,7 @@ docker-compose.override.yml
 # 환경 설정
 .env
 .env.*
-!.env.test    # ✅ test용만 Git에 포함
+!.env.sample
 
 
 # Prisma client

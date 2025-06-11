@@ -1,4 +1,4 @@
-import { prisma } from '@/lib/prisma';
+import { prisma } from '@/lib/prisma/prisma';
 import { User, UserUpdateDto } from '@shared/types/user/user.types';
 
 export const findUserAll = (): Promise<User[]> => {

@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 import bcrypt from 'bcrypt';
-import { prisma, Prisma } from '@/lib/prisma';
+import { prisma, Prisma } from '@/lib/prisma/prisma';
 import { resCustom } from '@/utils/response';
 
 import { UserLoginDto, UserResponseDto } from '@shared/types/user/user.types';

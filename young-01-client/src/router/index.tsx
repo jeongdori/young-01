@@ -8,6 +8,7 @@ import App from '@/App';
 import mainRoutes from './main.routes';
 import authRoutes from './auth.routes';
 import userRoutes from './user.routes';
+import studyRoutes from './study.routes';
 
 const routes = createBrowserRouter([
     {
@@ -22,6 +23,7 @@ const routes = createBrowserRouter([
                     ...mainRoutes,
                     ...authRoutes,
                     ...userRoutes,
+                    ...studyRoutes,
                 ],
             },
         ],

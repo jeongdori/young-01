@@ -1,11 +1,13 @@
 import { Response } from 'express';
 import createError, { HttpError } from 'http-errors';
 import logger from '@/lib/logger';
+import { Prisma } from '@/lib/prisma/prisma';
+import { isPrismaError, classifyPrismaError } from '@/lib/prisma/prisam-error';
 
 /**
  * 성공 응답 유틸
  * @param {Response} res
- * @param {any} data
+ * @param {unknown} data
  * @param {string} message
  * @param {number} status
  */
@@ -20,7 +22,7 @@ export const resSuccess = (res: Response, data: unknown, message = 'success', st
 /**
  * 공통 에러 응답
  * @param {Response} res - Express 응답 객체
- * @param {Error|string} error - Error 객체 or 커스텀 메시지
+ * @param {unknown} error - Error 객체 or 커스텀 메시지
  * @param {number} status - HTTP 상태 코드
  * @param {string} [customMessage] - 강제로 지정할 메시지 (선택)
  */
@@ -38,6 +40,10 @@ export const resError = (
         message = customMessage;
     } else if (typeof error === 'string') {
         message = error;
+    } else if (isPrismaError(error)) {
+        const { message: dbMessage, status: dbStatus } = classifyPrismaError(error);
+        message = dbMessage;
+        httpStatus = dbStatus;
     } else if (error instanceof Error) {
         message = error.message;
         stack = error.stack;

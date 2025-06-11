@@ -38,4 +38,16 @@ const logger = createLogger({
     exitOnError: false,
 });
 
+/**
+ * 로그 플러시 및 종료 대기 함수
+ */
+export async function flushLogger(): Promise<void> {
+    if (fileTransport) {
+        return new Promise((resolve) => {
+            fileTransport.on('finish', () => resolve());
+            fileTransport.end();
+        });
+    }
+}
+
 export default logger;

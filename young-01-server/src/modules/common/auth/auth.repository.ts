@@ -1,4 +1,4 @@
-import { prisma, Prisma, PrismaClient } from '@/lib/prisma';
+import { prisma, Prisma, PrismaClient } from '@/lib/prisma/prisma';
 import {
     User,
     UserLoginDto,
