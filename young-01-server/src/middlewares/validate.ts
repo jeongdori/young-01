@@ -17,12 +17,7 @@ const validate =
         const result = schema.safeParse(req[from]);
         if (!result.success) {
             logger.error('Validation success : ', result.success);
-            return resError(
-                res,
-                'VALIDATION_ERROR',
-                400,
-                result.error.errors[0].message || '유효성 검사 실패',
-            );
+            return resError(res, result.error, 400);
         }
         req[from] = result.data;
         next();

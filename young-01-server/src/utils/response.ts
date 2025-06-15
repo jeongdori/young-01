@@ -24,21 +24,13 @@ export const resSuccess = (res: Response, data: unknown, message = 'success', st
  * @param {Response} res - Express 응답 객체
  * @param {unknown} error - Error 객체 or 커스텀 메시지
  * @param {number} status - HTTP 상태 코드
- * @param {string} [customMessage] - 강제로 지정할 메시지 (선택)
  */
-export const resError = (
-    res: Response,
-    error: unknown,
-    status?: number,
-    customMessage?: string,
-) => {
+export const resError = (res: Response, error: unknown, status?: number) => {
     let message = 'internal server error';
     let httpStatus = status || 500;
     let stack: string | undefined = undefined;
 
-    if (customMessage) {
-        message = customMessage;
-    } else if (typeof error === 'string') {
+    if (typeof error === 'string') {
         message = error;
     } else if (isPrismaError(error)) {
         const { message: dbMessage, status: dbStatus } = classifyPrismaError(error);
