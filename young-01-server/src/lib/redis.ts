@@ -43,13 +43,30 @@ export const del = async (key: string) => {
     return await redisCommand(() => redis.del(key), `del${key}`);
 };
 
-async function redisCommand<T>(cmd: () => Promise<T>, keyDesc: string, timeout = 5000): Promise<T> {
+/**
+ * redis 매서드를 실행 공통 매서드
+ * @param {() => Promise<T>} cmd - 실행할 redis 매서드
+ * @param {string} keyDesc - 매서드명
+ * @param {number} timeout - 에러 발생 까지 기다릴 시간
+ * @returns
+ */
+async function redisCommand<T>(
+    cmd: () => Promise<T>,
+    keyDesc: string,
+    timeout: number = 5000,
+): Promise<T> {
     return withTimeout(cmd(), timeout).catch((err) => {
         logger.error(`[Redis] ${keyDesc} 실패`, err);
         throw new Error('Redis 오류가 발생했습니다.');
     });
 }
 
+/**
+ * timeout 발생 시 에러
+ * @param {Promise<T>} promise - 실행할 redis 매서드
+ * @param {number} ms - 에러 발생 까지 기다릴 시간
+ * @returns
+ */
 function withTimeout<T>(promise: Promise<T>, ms: number): Promise<T> {
     return new Promise((resolve, reject) => {
         const timer = setTimeout(() => {

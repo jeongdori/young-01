@@ -26,7 +26,14 @@ function startServer(): Server | null {
     return null;
 }
 
+/**
+ * 예외 이벤트 등록
+ * @param {Server} server - http Server
+ */
 function handleOnException(server: Server) {
+    /**
+     * 서버, 커넥션 등 종료
+     */
     const shutdown = async () => {
         logger.info('🔄 Shutting down...');
         if (server) server.close(() => logger.info('✅ HTTP server closed'));
