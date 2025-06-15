@@ -6,6 +6,7 @@ import useAuthStore from '@/stores/auth/authStore'; // 사용자 로그인 상�
 import GlobalLoader from '@/components/loading/GlobalLoader';
 
 import UserMenu from './components/UserMenu';
+import ScrollToTop from './components/ScrollToTop';
 
 const HomeLayout = () => {
     const { user } = useAuthStore(); // zustand 기반이라고 가정
@@ -38,6 +39,7 @@ const HomeLayout = () => {
             {/* 메인 콘텐츠 영역 */}
             <Container sx={{ mt: 4 }}>
                 <Outlet />
+                <ScrollToTop />
             </Container>
         </>
     );
