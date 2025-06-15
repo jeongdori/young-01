@@ -12,7 +12,7 @@ import {
 import LogoutIcon from '@mui/icons-material/Logout';
 import PersonIcon from '@mui/icons-material/Person';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import useAuthStore from '@/stores/auth/authStore';
 import useLogout from '@/features/auth/hook/useLogout';
 import { useNavigate } from 'react-router-dom';
@@ -22,10 +22,10 @@ const UserMenu = () => {
     const logout = useLogout();
     const navigate = useNavigate();
 
-    const [anchorEl, setAnchorEl] = useState(null);
+    const [anchorEl, setAnchorEl] = useState<null | Element>(null);
     const open = Boolean(anchorEl);
 
-    const handleOpen = (event) => {
+    const handleOpen = (event: React.MouseEvent) => {
         setAnchorEl(event.currentTarget);
     };
     const handleClose = () => setAnchorEl(null);
@@ -43,8 +43,8 @@ const UserMenu = () => {
     return (
         <>
             <IconButton onClick={handleOpen} sx={{ ml: 2 }}>
-                <Avatar alt={user.name} sx={{ width: 32, height: 32 }}>
-                    {user.name?.charAt(0) || 'U'}
+                <Avatar alt={user?.name ?? undefined} sx={{ width: 32, height: 32 }}>
+                    {user?.name?.charAt(0) || 'U'}
                 </Avatar>
             </IconButton>
 
@@ -56,9 +56,9 @@ const UserMenu = () => {
                 transformOrigin={{ vertical: 'top', horizontal: 'right' }}
             >
                 <Stack spacing={0.5} sx={{ px: 2, py: 1 }}>
-                    <Typography variant="subtitle1">{user.name}</Typography>
+                    <Typography variant="subtitle1">{user?.name}</Typography>
                     <Typography variant="body2" color="text.secondary">
-                        {user.email}
+                        {user?.email}
                     </Typography>
                 </Stack>
 
