@@ -2,7 +2,7 @@ import instance from '@/api/axios';
 import useAuthStore from '@/stores/auth/authStore';
 import { useNavigate } from 'react-router-dom';
 
-import services from '../services';
+import services from '../auth.service';
 
 const useLogout = () => {
     const logoutState = useAuthStore((state) => state.logout);

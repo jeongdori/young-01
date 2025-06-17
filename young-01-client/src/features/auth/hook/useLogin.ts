@@ -5,7 +5,7 @@ import { importRSAPublicKey, encryptWithRSA } from '@/utils/rsaEncrypt';
 
 import { UserLoginDto, UserLoginInputDto } from '@shared/types/user/user.types';
 
-import authService from '../services';
+import authService from '../auth.service';
 
 const useLogin = () => {
     const navigate = useNavigate();

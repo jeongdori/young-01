@@ -1,7 +1,7 @@
 import { useQuery } from '@/lib/QueryClient';
 
 // util
-import userService from '../services';
+import userService from '../user.service';
 
 // components
 

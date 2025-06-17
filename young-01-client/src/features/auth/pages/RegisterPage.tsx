@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod';
 
 // util
 import { useMutation } from '@/lib/QueryClient';
-import authService from '../services';
+import authService from '../auth.service';
 
 // types/schema
 import { UserRegisterDto } from '@shared/types/user/user.types';
@@ -71,13 +71,25 @@ const RegisterPage = () => {
                     <TextField label="이메일" fullWidth margin="normal" {...register('email')} />
                     <FormError name="email" />
 
-                    <TextField label="비밀번호" type="password" fullWidth margin="normal" {...register('password')} />
+                    <TextField
+                        label="비밀번호"
+                        type="password"
+                        fullWidth
+                        margin="normal"
+                        {...register('password')}
+                    />
                     <FormError name="password" />
 
                     <TextField label="이름" fullWidth margin="normal" {...register('name')} />
                     <FormError name="name" />
 
-                    <Button type="submit" variant="contained" color="primary" fullWidth disabled={mutation.isPending}>
+                    <Button
+                        type="submit"
+                        variant="contained"
+                        color="primary"
+                        fullWidth
+                        disabled={mutation.isPending}
+                    >
                         회원가입
                     </Button>
                 </form>
