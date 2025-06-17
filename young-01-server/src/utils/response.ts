@@ -29,13 +29,16 @@ export const resError = (res: Response, error: unknown, status?: number) => {
     let message = 'internal server error';
     let httpStatus = status || 500;
     let stack: string | undefined = undefined;
+    let logError = error;
 
     if (typeof error === 'string') {
         message = error;
     } else if (isPrismaError(error)) {
-        const { message: dbMessage, status: dbStatus } = classifyPrismaError(error);
+        const { message: dbMessage, status: dbStatus, error: dbError } = classifyPrismaError(error);
         message = dbMessage;
         httpStatus = dbStatus;
+        stack = dbError.stack;
+        logError = dbError;
     } else if (error instanceof Error) {
         message = error.message;
         stack = error.stack;
@@ -51,6 +54,7 @@ export const resError = (res: Response, error: unknown, status?: number) => {
         message,
         status: httpStatus,
         stack: stack,
+        error: logError,
     });
 
     res.status(httpStatus).json({
