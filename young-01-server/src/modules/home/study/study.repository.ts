@@ -5,9 +5,9 @@ import { Topic, TopicTree } from '@shared/types/study/study.types';
 const findTree = async () => {
     const findNodes = await prisma.topic.findMany({
         where: { isUse: true },
-        orderBy: { depth: 'asc', sortOrder: 'asc' },
+        orderBy: [{ depth: 'asc' }, { sortOrder: 'asc' }],
     });
-    console.log('findNodes', findNodes);
+
     // 재귀 방식
     function buildTreeRec(nodes: Topic[], parentId: number | null = null): any[] {
         return nodes
