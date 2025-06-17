@@ -1,15 +1,14 @@
-import axios from 'axios';
-import type { AxiosResponse, AxiosError } from 'axios';
-import { AxiosHeaders } from 'axios';
-
-// util
+import axios, { AxiosRequestConfig, AxiosResponse, AxiosError, AxiosHeaders } from 'axios';
 import { v4 as uuidv4 } from 'uuid';
 
 // type
 import type { ApiErrorResponse } from '@/types/index';
 
-import handleAuthError from './handlers/handleAuthError';
-import handleApiError from './handlers/handleApiError';
+// store
+import useErrorStore from '@/stores/error/errorStore';
+
+// util
+import { refreshManager } from './util/refreshManager';
 
 /**
  * withCredentials
@@ -32,7 +31,7 @@ const DEFAULT_META = {
 // ──────────────────────────────────────────────────────────────
 // 요청 인터셉터
 instance.interceptors.request.use(
-    (config) => {
+    async (config) => {
         // 헤더 구성
         const headers = new AxiosHeaders(config.headers);
         headers.set('X-Request-Id', uuidv4());
@@ -56,9 +55,7 @@ instance.interceptors.request.use(
 // 응답 인터셉터
 instance.interceptors.response.use(
     (response: AxiosResponse) => {
-        const status = response.status;
-        const raw = response.data;
-        const cfg = response.config;
+        const { status, data: raw, config: cfg } = response;
         const { method, url, meta } = cfg;
 
         if (raw.success) {
@@ -87,20 +84,45 @@ instance.interceptors.response.use(
         const status = error.response?.status;
         const message = error.response?.data?.message ?? '알 수 없는 오류가 발생했습니다.';
         const cfg = error.config;
-        if (!cfg) return Promise.reject(error);
-        const { meta, method, url } = cfg;
+        const { meta, method, url } = cfg ?? {};
 
-        // auth ckeck..
-        const authHandled = await handleAuthError(error, instance);
-        if (authHandled != null) return authHandled;
+        if (!cfg) return Promise.reject(error);
+
+        // logger
         logOnDev(
             meta?.log,
             'error',
             `🚨 [API] [ERROR] ${method?.toUpperCase()} ${url} → (${status}) ${message}`,
         );
 
+        // refresh
+        if (status === 401) {
+            return new Promise((resolve, reject) => {
+                refreshManager
+                    .ensureToken()
+                    .then(() => {
+                        instance(cfg).then(resolve).catch(reject);
+                    })
+                    .catch((e) => {
+                        reject(e);
+                    });
+            });
+        }
+        // no auth - logout
+        if (status === 403) refreshManager.logout();
         // error
-        return handleApiError(error, meta);
+        if (meta?.alert) {
+            alert(`[${status}] 오류 :  ${message}`);
+        } else {
+            useErrorStore.getState().setError({
+                status,
+                statusText: message,
+            });
+
+            window.location.href = '/error';
+        }
+
+        return Promise.reject(error);
     },
 );
 /**
