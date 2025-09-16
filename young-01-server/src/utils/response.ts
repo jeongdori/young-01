@@ -1,8 +1,11 @@
 import { Response } from 'express';
 import createError, { HttpError } from 'http-errors';
+import util from 'util';
 import logger from '@/lib/logger';
 import { Prisma } from '@/lib/prisma/prisma';
 import { isPrismaError, classifyPrismaError } from '@/lib/prisma/prisam-error';
+
+const MODE = process.env.NODE_ENV;
 
 /**
  * 성공 응답 유틸
@@ -12,6 +15,10 @@ import { isPrismaError, classifyPrismaError } from '@/lib/prisma/prisam-error';
  * @param {number} status
  */
 export const resSuccess = (res: Response, data: unknown, message = 'success', status = 200) => {
+    console.log('data', data);
+    // if (MODE !== 'prod') {
+    //     logger.info(`[RES DATA] ${util.inspect(data, { depth: null, maxArrayLength: 10 })}`);
+    // }
     res.status(status).json({
         success: true,
         message,

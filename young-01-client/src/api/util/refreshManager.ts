@@ -13,11 +13,20 @@ class RefreshManager {
         timeout: 10000,
     });
 
-    public async ensureToken() {
+    public async waitForRefresh() {
         if (this.refreshing) {
-            // Refresh 중이면 queue에 대기
+            console.log('RefreshManager queue push');
             await new Promise<void>((resolve) => this.queue.push(resolve));
             return;
+        }
+    }
+
+    public async ensureToken(retryRequest: () => Promise<any>) {
+        // Refresh 중이면 queue에 대기
+        if (this.refreshing) {
+            return new Promise((resolve, reject) => {
+                this.queue.push(() => retryRequest().then(resolve).catch(reject));
+            });
         }
 
         // 토큰 만료 여부는 상황에 따라 로직 추가 가능 (ex. localStorage token expiry check)
@@ -26,6 +35,8 @@ class RefreshManager {
         try {
             await this.refreshInstance.post('/refresh');
         } catch (e) {
+            this.queue = [];
+            this.refreshing = false;
             useAuthStore.getState().logout();
             const currentPath = window.location.pathname + window.location.search;
             alert('로그인이 만료되었습니다. 다시 로그인해주세요.');
@@ -33,9 +44,11 @@ class RefreshManager {
             throw e;
         } finally {
             this.refreshing = false;
-            this.queue.forEach((cb) => cb());
+            const pending = [...this.queue];
             this.queue = [];
+            pending.forEach((cb) => cb());
         }
+        return retryRequest();
     }
 
     public logout() {

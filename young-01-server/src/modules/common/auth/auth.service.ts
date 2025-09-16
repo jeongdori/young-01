@@ -39,12 +39,12 @@ const decryptPassword = (encrypted: string) => {
 
 export const login = async ({ email, password }: UserLoginDto) => {
     const user = await findUserForLogin(email!);
-    if (!user) throw resCustom(401, '존재하지 않는 사용자입니다');
+    if (!user) throw resCustom(422, '존재하지 않는 사용자입니다');
 
     const dncryptedPassword = decryptPassword(password);
 
     const match = await bcrypt.compare(dncryptedPassword, user.password);
-    if (!match) throw resCustom(401, '비밀번호가 일치하지 않습니다');
+    if (!match) throw resCustom(422, '비밀번호가 일치하지 않습니다');
 
     const plainUser = {
         id: user.id,

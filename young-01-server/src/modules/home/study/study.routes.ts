@@ -2,11 +2,11 @@ import { Router } from 'express';
 const router = Router();
 import validate from '@/middlewares/validate';
 
-import { findTree } from './study.controller';
+import { findTree, findNode } from './study.controller';
 // import { updateSchema } from '@shared/types/study/study.schema';
 
 router.get('/', findTree); // 전체
-// router.get('/:id'); // 상세 정보
+router.get('/:id', findNode); // 상세 정보
 // router.post('/'); // 노드 추가
 // router.put('/:id'); // 노드 수정
 // router.delete('/:id'); // 삭제

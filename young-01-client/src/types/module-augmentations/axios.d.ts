@@ -12,9 +12,6 @@ declare module 'axios' {
             redirectError?: boolean;
             log?: boolean;
         };
-
-        /** 토큰 재발급 재시도 여부를 붙여두는 용도 (_retry) */
-        _retry?: boolean;
     }
 }
 

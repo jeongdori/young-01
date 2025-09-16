@@ -4,7 +4,6 @@ import { TreeItem, SimpleTreeView } from '@mui/x-tree-view';
 type TreeNode<T> = {
     id: number | string;
     title: string;
-    content?: string;
     children?: T[];
 };
 
@@ -28,11 +27,6 @@ const MenuTree = <T extends TreeNode<T>>({
                 label={
                     <Box>
                         <Typography fontWeight="bold">{node.title}</Typography>
-                        {node.content && (
-                            <Typography fontSize="small" color="secondary">
-                                {node.content}
-                            </Typography>
-                        )}
                     </Box>
                 }
             >

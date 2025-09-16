@@ -11,3 +11,17 @@ export const findTree = async (req: Request, res: Response) => {
         resError(res, err);
     }
 };
+
+export const findNode = async (req: Request, res: Response) => {
+    try {
+        const id = Number(req.params.id);
+        if (isNaN(id)) throw resCustom(400, '유효하지 않은 ID 입니다.');
+
+        const node = await studyService.findNode(id);
+        if (!node) throw resCustom(404, '존재하지 않는 노드입니다.');
+
+        resSuccess(res, node);
+    } catch (err) {
+        resError(res, err);
+    }
+};

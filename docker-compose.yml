@@ -1,10 +1,42 @@
 version: "3.8"
 
 services:
+  mysql:
+    image: mysql:8.4
+    container_name: mysql
+    command: >
+      --character-set-server=utf8mb4
+      --collation-server=utf8mb4_0900_ai_ci
+    environment:
+      MYSQL_ROOT_PASSWORD: qwe123!@
+      MYSQL_DATABASE: young01        # 선택
+      MYSQL_USER: young          # 선택
+      MYSQL_PASSWORD: qwe123!@   # 선택
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      # 초기 스키마/데이터가 필요하면 여기에 .sql 넣어두기 (선택)
+      # - ./init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-proot_pw", "-h", "127.0.0.1" ]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
   redis:
     image: redis:7
     container_name: redis
     ports:
       - "6379:6379"
     volumes:
-      - ./data/redis:/data
+      - redis_data:/data
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+
+volumes:
+  mysql_data:
+  redis_data:

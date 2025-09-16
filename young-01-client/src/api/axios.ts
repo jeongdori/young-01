@@ -35,8 +35,8 @@ instance.interceptors.request.use(
         // 헤더 구성
         const headers = new AxiosHeaders(config.headers);
         headers.set('X-Request-Id', uuidv4());
-        headers.set('X-Site-Id', 'young-01');
-        headers.set('X-Client-Version', '1.0.0');
+        headers.set('X-Id', 'young-01');
+        headers.set('X-Version', '1.0.0');
         // headers.set('X-Locale', getCurrentLocale())
         headers.set('X-Timezone', Intl.DateTimeFormat().resolvedOptions().timeZone);
 
@@ -97,15 +97,12 @@ instance.interceptors.response.use(
 
         // refresh
         if (status === 401) {
+            if (!cfg) return Promise.reject(error);
             return new Promise((resolve, reject) => {
                 refreshManager
-                    .ensureToken()
-                    .then(() => {
-                        instance(cfg).then(resolve).catch(reject);
-                    })
-                    .catch((e) => {
-                        reject(e);
-                    });
+                    .ensureToken(() => instance({ ...cfg }))
+                    .then(resolve)
+                    .catch(reject);
             });
         }
         // no auth - logout
@@ -140,7 +137,7 @@ export const logOnDev = (
     if (!log) return;
 
     const mode = import.meta.env.MODE;
-    const modeTag = `[${mode.toUpperCase()}]`;
+    const modeTag = `[${mode.toUpperCase()} MODE]`;
     if (mode === 'test' || mode === 'dev') {
         switch (level) {
             case 'log':

@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  // output   = "../src/generated/prisma"
 }
 
 datasource db {
@@ -13,7 +12,6 @@ model User {
   email             String?        @unique(map: "email") @db.VarChar(255)
   password          String?        @db.VarChar(255)
   name              String?        @db.VarChar(100)
-
   userGroupMappings UserGroupMap[]
 
   @@map("users")
@@ -23,7 +21,6 @@ model Group {
   id                Int            @id @default(autoincrement())
   name              String         @unique(map: "name") @db.VarChar(50)
   description       String?        @db.VarChar(255)
-
   userGroupMappings UserGroupMap[]
 
   @@map("auth_groups")
@@ -37,27 +34,25 @@ model UserGroupMap {
 
   @@id([user_id, group_id])
   @@index([group_id], map: "group_id")
-  @@index([user_id], map: "user_id")
   @@map("user_group_map")
 }
 
-
 model Topic {
-  id         Int      @id @default(autoincrement())
-  parentId   Int?
-  depth      Int      @default(0)
-  isLeaf     Boolean  @default(false)
-  title      String   @db.VarChar(200)
-  content    String?  @db.VarChar(1000)
-  isUse      Boolean  @default(true)
-  status     String?
-  remark     String?
-  sortOrder  Int      @default(0)
-  createdAt  DateTime @default(now())
-  updatedAt  DateTime? @updatedAt
+  id        Int       @id @default(autoincrement())
+  parentId  Int?
+  title     String?   @db.VarChar(200)
+  content   String?   @db.VarChar(1000)
+  sortOrder Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime? @updatedAt
+  depth     Int       @default(0)
+  isLeaf    Boolean   @default(false)
+  isUse     Boolean   @default(true)
+  remark    String?
+  status    String?
+  parent    Topic?    @relation("TopicToTopic", fields: [parentId], references: [id])
+  children  Topic[]   @relation("TopicToTopic")
 
-  parent     Topic?   @relation("TopicToTopic", fields: [parentId], references: [id])
-  children   Topic[]  @relation("TopicToTopic")
-
+  @@index([parentId], map: "note_tree_parentId_fkey")
   @@map("note_tree")
 }
